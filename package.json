@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "aos": "^2.3.4",
+    "bootstrap": "^5.3.8",
+    "formik": "^2.4.9",
+    "html2canvas": "^1.4.1",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.7",
+    "react-countup": "^6.5.3",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.79.0",
+    "react-qr-code": "^2.2.0",
+    "react-toastify": "^11.1.0",
+    "yup": "^1.7.1"
+  }
+}
