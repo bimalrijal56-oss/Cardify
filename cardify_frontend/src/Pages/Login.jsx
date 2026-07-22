@@ -10,7 +10,7 @@ const Login = () => {
   const handleSubmit = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/login",
+        "https://cardify-production-6e02.up.railway.app/login",
         {
           email: values.email,
           password: values.pwd,

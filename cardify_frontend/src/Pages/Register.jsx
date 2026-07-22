@@ -17,7 +17,7 @@ const Register = () => {
 
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/sign-up",
+                "https://cardify-production-6e02.up.railway.app/sign-up",
                 {
                     username: values.uname,
                     password: values.pwd,

@@ -76,6 +76,7 @@ def signup(request):
             return JsonResponse({"message":"User created sucessfully","id":user.id},status=201)
         except Exception as e:
          return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST requests are allowed"}, status=405)  
         
         
         
@@ -84,15 +85,20 @@ def login(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
         try:
-            user =User.objects.get(email=data['email'])
+            user = User.objects.get(email=data['email'])
         except User.DoesNotExist:
-            return JsonResponse({"error":"User not found"},status=status.HTTP_404_NOT_FOUND)
-        if not check_password(data['password'],user.password):
-            return JsonResponse({"error":"Invalid email or password"},status=status.HTTP_400_BAD_REQUEST)
-        username = str(user.name)
-        id = int(user.id)
-        
-        return JsonResponse({"message":"Logged in sucessfully","user_id":user.id,"username":user.name},status=status.HTTP_200_OK)
+            return JsonResponse({"error": "User not found"}, status=404)
+
+        if not check_password(data['password'], user.password):
+            return JsonResponse({"error": "Invalid email or password"}, status=400)
+
+        return JsonResponse({
+            "message": "Logged in successfully",
+            "user_id": user.id,
+            "username": user.name
+        }, status=200)
+
+    return JsonResponse({"error": "Only POST requests are allowed"}, status=405)
     
     
     

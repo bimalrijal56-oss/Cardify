@@ -34,6 +34,8 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
+    "https://cardify-plum.vercel.app",
+    
 ]
 
 
@@ -69,7 +71,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://cardify.com"
+    "https://cardify-production-6e02.up.railway.app",
+      "https://cardify-plum.vercel.app",
   
 ]
 
