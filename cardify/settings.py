@@ -164,6 +164,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+WHITENOISE_MANIFEST_STRICT = False
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
