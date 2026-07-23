@@ -39,7 +39,7 @@ const Cardlist = () => {
 
               <h1 className="hero-subtitle">Watch Your Created  Cards</h1>
               <h1 className="hero-subtitle text-info">From Starting <i class="bi bi-arrow-down"></i></h1>
-              <p className="hero-description">Yor card is generated according to your specification,have a look and share or save according to need.</p>
+              <p className="hero-description text-white">Yor card is generated according to your specification,have a look and share or save according to need.</p>
             </div>
           </div>
         </div>
@@ -122,8 +122,8 @@ const Cardlist = () => {
                           <p className='text-dark'>Created at: {item.created_at}</p>
                         </div>
                         <div className="envelope-buttons">
-                          <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-lg-5" state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <Link to={'/'} className="btn btn-outline-info text-dark">Create New</Link>
+                          <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2" state={{ cardData: item, image: item.image }}> View Card</Link>
+                          <Link to={'/'} className="btn btn-outline-info text-dark mt-2">Create New</Link>
                         </div>
                       </div>
 

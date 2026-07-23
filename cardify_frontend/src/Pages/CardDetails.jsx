@@ -6,101 +6,118 @@ import { toast, ToastContainer } from "react-toastify";
 import QRCode from "react-qr-code";
 
 const CardDetails = () => {
-  const location= useLocation()
+  const location = useLocation()
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(!location.state?.theme){
-      navigate("/",{replace:true});
-      toast.error("Page refreshed.Please select a theme again.",{className:'toast-error-glow'});
+  useEffect(() => {
+    if (!location.state?.theme) {
+      navigate("/", { replace: true });
+      toast.error("Page refreshed.Please select a theme again.", { className: 'toast-error-glow' });
     }
-  },[location,navigate]);
+  }, [location, navigate]);
 
 
   const theme = location.state?.theme;
 
-  const [image,setImage]=useState(null);
+  const [image, setImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  
 
-  const [cardData,setCardData]= useState({
-    name:"",
-    job:"",
-    company:"",
-    address:"",
-    tel:"",
-    email:"",
-    website:"",
-    facebook:"",
-    twitter:"",
-    linkedin:"",
-    instagram:"",
-    theme:theme || ""
+
+  const [cardData, setCardData] = useState({
+    name: "",
+    job: "",
+    company: "",
+    address: "",
+    tel: "",
+    email: "",
+    website: "",
+    facebook: "",
+    twitter: "",
+    linkedin: "",
+    instagram: "",
+    theme: theme || ""
   })
 
-  const handleChange=(e)=>{
+  const handleChange = (e) => {
     setCardData({
       ...cardData,
-      [e.target.name]:e.target.value
+      [e.target.name]: e.target.value
     })
   }
 
-  const handleSubmit=(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("image",image);
-    formData.append("name",cardData.name);
-    formData.append("job",cardData.job);
-    formData.append("company",cardData.company);
-    formData.append("address",cardData.address);
-    formData.append("tel",cardData.tel);
-    formData.append("email",cardData.email);
-    formData.append("web_url",cardData.website);
-    formData.append("fb_link",cardData.facebook);
-    formData.append("twitter_link",cardData.twitter);
-    formData.append("linkedin_link",cardData.linkedin);
-    formData.append("insta_link",cardData.instagram);
-    formData.append("theme",cardData.theme);
-    formData.append("user",localStorage.getItem("user_id"));
+    if (isSubmitting) {
+      return;
+    }
 
-    console.log(localStorage.getItem("user_id"));
-    for (let pair of formData.entries()) {
-    console.log(pair[0], pair[1]);
-}
-    axios.post("https://cardify-production-6e02.up.railway.app/api/cards/",formData,
-      {
-        headers:{
-          "Content-Type":"multipart/form-data"
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    if (image) {
+      formData.append("image", image);
+    }
+    formData.append("name", cardData.name);
+    formData.append("job", cardData.job);
+    formData.append("company", cardData.company);
+    formData.append("address", cardData.address);
+    formData.append("tel", cardData.tel);
+    formData.append("email", cardData.email);
+    formData.append("web_url", cardData.website);
+    formData.append("fb_link", cardData.facebook);
+    formData.append("twitter_link", cardData.twitter);
+    formData.append("linkedin_link", cardData.linkedin);
+    formData.append("insta_link", cardData.instagram);
+    formData.append("theme", cardData.theme);
+    formData.append("user", localStorage.getItem("user_id"));
+
+    try {
+      const response = await toast.promise(
+        axios.post("https://cardify-production-6e02.up.railway.app/api/cards/", formData),
+        {
+          pending: "Creating your card...",
+          success: "Card created successfully",
+          error: "An error occurred while creating the card."
         }
-      }
-    )
-    .then((response)=>{
-       
-      
-      toast.success("Card created successfully", { className: 'toast-success-glow' },)
-      navigate(`/card-preview/${response.data.uuid}`,{state:{cardData:cardData,image:image}});
-      
-    })
-    .catch((error)=>{
-      toast.error(error.response?.data || "An error occurred while creating the card."),{className:'toast-error-glow'};
-    })
+      );
+      navigate(`/card-preview/${response.data.uuid}`, { state: { cardData: cardData, image: image } });
+    } catch (error) {
+      const errorData = error.response?.data;
+      const errorMessage = typeof errorData === "string"
+        ? errorData
+        : errorData && typeof errorData === "object"
+          ? Object.values(errorData).flat().filter(Boolean).join(" ") || "An error occurred while creating the card."
+          : "An error occurred while creating the card.";
+
+      toast.error(errorMessage, { className: 'toast-error-glow' });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
   return (
     <>
 
       <section className='hero'>
-<div className="container">
+        <div className="container">
           <div className="row align-items-center">
-          <div className="infocard col-md-12 px-5">
+            <div className="infocard col-md-12 px-5">
 
-            <div className="hero-tag ">
-              <span className='hero-tag-dot'></span>
-              <span className="text-info">Trusted by 50,000+ Professionals</span>
+              <div className="hero-tag ">
+                <span className='hero-tag-dot'></span>
+                <span className="text-info">Trusted by 50,000+ Professionals</span>
+              </div>
+              <h1 className="hero-subtitle">Customize Your Business Card,</h1>
+              <h1 className="hero-subtitle text-info">According To Your Needs</h1>
+              <p className="hero-description">Customize your business card to reflect your unique style and professional brand.</p>
+
+
+
+
+
+
             </div>
-            <h1 className="hero-subtitle">Customize Your Business Card,</h1>
-            <h1 className="hero-subtitle text-info">According To Your Needs</h1>
-            <p className="hero-description">Customize your business card to reflect your unique style and professional brand.</p>
 
 
 
@@ -108,14 +125,7 @@ const CardDetails = () => {
 
 
           </div>
-
-
-
-
-
-
         </div>
-</div>
 
       </section>
 
@@ -132,149 +142,149 @@ const CardDetails = () => {
             <p className="details-des">Fill in your details and see the live preview before sharing. <br /> No limits.</p>
 
 
-      <form onSubmit={handleSubmit} className='w-100'>
+            <form onSubmit={handleSubmit} className='w-100'>
 
-                    <div className=" img-upload my-5">
+              <div className=" img-upload my-5">
 
-              <div className="upload-header px-3 ">
-                <i className="bi bi-camera fs-4 me-3 text-info"></i>
-                <span className="fs-5 text-secondary">Profile Photo</span>
-              </div>
-              <hr className="w-100 border border-secondary my-1" />
+                <div className="upload-header px-3 ">
+                  <i className="bi bi-camera fs-4 me-3 text-info"></i>
+                  <span className="fs-5 text-secondary">Profile Photo</span>
+                </div>
+                <hr className="w-100 border border-secondary my-1" />
 
-              <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
+                <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
 
-                <div className=" click-to-upload d-flex flex-column align-items-center justify-content-center mt-4">
+                  <div className=" click-to-upload d-flex flex-column align-items-center justify-content-center mt-4">
 
-                  <i className="bi bi-cloud-upload fs-3"></i>
-                 
-                  <input type="file" onChange={(e)=>setImage(e.target.files[0])} className=" profile text-info"></input>
-                  <p className="text-secondary py-2">PNG, JPG up to 5MB · Recommended 400×400</p>
+                    <i className="bi bi-cloud-upload fs-3"></i>
+
+                    <input type="file" onChange={(e) => setImage(e.target.files[0])} className=" profile text-info"></input>
+                    <p className="text-secondary py-2">PNG, JPG up to 5MB · Recommended 400×400</p>
+
+                  </div>
 
                 </div>
 
               </div>
 
-            </div>
+
+
+              <div className="col-md-7 img-upload my-5">
+
+                <div className="upload-header px-3 ">
+                  <i className="bi bi-person-fill fs-4 me-3 text-info"></i>
+                  <span className="fs-5 text-secondary">Basic information</span>
+                </div>
+                <hr className="w-100 border border-secondary my-1" />
+
+                <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
+
+                  <div className="input-row ">
+                    <div className="input-group-custom">
+                      <label htmlFor="name">Name</label>
+                      <input type="text" id="name" name="name" placeholder="Enter your name" className="form-control" value={cardData.name} onChange={handleChange}></input>
+
+                    </div>
+                    <div className="input-group-custom">
+                      <label htmlFor="job">Job</label>
+                      <input type="text" id="job" name="job" placeholder="Enter your job" className="form-control" value={cardData.job} onChange={handleChange}></input>
+
+                    </div>
+                  </div>
+                  <div className="input-row">
+
+
+                    <div className="input-group-custom">
+                      <label htmlFor="company">Company</label>
+                      <input type="text" id="company" name="company" placeholder="Enter your company" className="form-control" value={cardData.company} onChange={handleChange}></input>
+
+                    </div>
+
+                    <div className="input-group-custom">
+                      <label htmlFor="address">Address</label>
+                      <input type="text" id="address" name="address" placeholder="Enter your address" className="form-control" value={cardData.address} onChange={handleChange}></input>
+
+                    </div>
+
+                  </div>
 
 
 
-            <div className="col-md-7 img-upload my-5">
 
-              <div className="upload-header px-3 ">
-                <i className="bi bi-person-fill fs-4 me-3 text-info"></i>
-                <span className="fs-5 text-secondary">Basic information</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                </div>
+
               </div>
-              <hr className="w-100 border border-secondary my-1" />
 
-              <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
+
+
+
+              <div className="col-md-7 img-upload my-5">
+
+                <div className="upload-header px-3 ">
+                  <i className="bi bi-person-badge fs-4 me-3 text-info"></i>
+                  <span className="fs-5 text-secondary">Contact Information</span>
+                </div>
+                <hr className="w-100 border border-secondary my-1" />
+
+                <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
+
+
+                  <div className="input-row ">
+                    <div className="input-group-custom">
+                      <label htmlFor="phone">Phone no</label>
+                      <input type="text" id="tel" name="tel" placeholder="Enter your phone" className="form-control" value={cardData.tel} onChange={handleChange}></input>
+
+                    </div>
+                    <div className="input-group-custom">
+                      <label htmlFor="email">Email</label>
+                      <input type="text" id="email" name="email" placeholder="Enter your email" className="form-control" value={cardData.email} onChange={handleChange}></input>
+
+                    </div>
+                  </div>
+                  <div className="input-row">
+
+
+
+                    <div className="input-group-custom">
+                      <label htmlFor="website">Website Url</label>
+                      <input type="text" id="website" name="website" placeholder="Enter your website url" className="form-control" value={cardData.website} onChange={handleChange}></input>
+
+                    </div>
+
+                  </div>
+                </div>
+
+
+              </div>
+
+
+
+
+
+              <div className="col-md-7 img-upload my-5">
+
+                <div className="upload-header px-3 ">
+                  <i className="bi bi-share-fill fs-4 me-3 text-info"></i>
+                  <span className="fs-5 text-secondary">Social Media Links</span>
+                </div>
+                <hr className="w-100 border border-secondary my-1" />
 
                 <div className="input-row ">
-                  <div className="input-group-custom">
-                    <label htmlFor="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter your name" className="form-control" value={cardData.name} onChange={handleChange}></input>
-
-                  </div>
-                  <div className="input-group-custom">
-                    <label htmlFor="job">Job</label>
-                    <input type="text" id="job" name="job" placeholder="Enter your job" className="form-control"value={cardData.job}onChange={handleChange}></input>
-
-                  </div>
-                </div>
-                <div className="input-row">
-
-
-                  <div className="input-group-custom">
-                    <label htmlFor="company">Company</label>
-                    <input type="text" id="company" name="company" placeholder="Enter your company" className="form-control"value={cardData.company}onChange={handleChange}></input>
-
-                  </div>
-
-                  <div className="input-group-custom">
-                    <label htmlFor="address">Address</label>
-                    <input type="text" id="address" name="address" placeholder="Enter your address" className="form-control"value={cardData.address}onChange={handleChange}></input>
-
-                  </div>
-
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-              </div>
-
-            </div>
-
-
-
-
-            <div className="col-md-7 img-upload my-5">
-
-              <div className="upload-header px-3 ">
-                <i className="bi bi-person-badge fs-4 me-3 text-info"></i>
-                <span className="fs-5 text-secondary">Contact Information</span>
-              </div>
-              <hr className="w-100 border border-secondary my-1" />
-
-              <div className="col-md-7 d-flex flex-column justify-content-center align-items-center  w-100">
-
-
-                <div className="input-row ">
-                  <div className="input-group-custom">
-                    <label htmlFor="phone">Phone no</label>
-                    <input type="text" id="tel" name="tel" placeholder="Enter your phone" className="form-control" value={cardData.tel} onChange={handleChange}></input>
-
-                  </div>
-                  <div className="input-group-custom">
-                    <label htmlFor="email">Email</label>
-                    <input type="text" id="email" name="email" placeholder="Enter your email" className="form-control" value={cardData.email} onChange={handleChange}></input>
-
-                  </div>
-                </div>
-                <div className="input-row">
-
-
-
-                  <div className="input-group-custom">
-                    <label htmlFor="website">Website Url</label>
-                    <input type="text" id="website" name="website" placeholder="Enter your website url" className="form-control" value={cardData.website} onChange={handleChange}></input>
-
-                  </div>
-
-                </div>
-              </div>
-              
-
-            </div>
-
-
-
-
-
-            <div className="col-md-7 img-upload my-5">
-
-              <div className="upload-header px-3 ">
-                <i className="bi bi-share-fill fs-4 me-3 text-info"></i>
-                <span className="fs-5 text-secondary">Social Media Links</span>
-              </div>
-              <hr className="w-100 border border-secondary my-1" />
-
-                    <div className="input-row ">
                   <div className="input-group-custom">
                     <label htmlFor="facebook">Facebook</label>
                     <input type="text" id="facebook" name="facebook" placeholder="Enter your facebook" className="form-control" value={cardData.facebook} onChange={handleChange}></input>
@@ -301,14 +311,14 @@ const CardDetails = () => {
 
                   </div>
 
-                  
+
 
                 </div>
-                
 
-            </div>
-<button className="create-btn w-50 border rounded-3" type="submit">Create</button>
-      </form>
+
+              </div>
+              <button className="create-btn w-50 border rounded-3" type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating..." : "Create"}</button>
+            </form>
 
 
 
@@ -332,10 +342,10 @@ const CardDetails = () => {
 
           <div className="sticky-scroll col-md-5 ">
             <div className="d-flex flex-column align-items-start">
-            <div className="example-tag">
-              <span className='example-tag-dot'></span>
-              <span className="example-text">Card Example</span>
-            </div>
+              <div className="example-tag">
+                <span className='example-tag-dot'></span>
+                <span className="example-text">Card Example</span>
+              </div>
 
             </div>
 
@@ -377,13 +387,13 @@ const CardDetails = () => {
 
 
 
-          
+
 
         </div>
-      
+
 
       </div>
-   
+
 
     </>
   )

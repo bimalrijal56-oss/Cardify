@@ -78,7 +78,7 @@ const Dashboard = () => {
         <div className="dash-info col-md-12 d-flex-column justify-content-center align-items-center py-2 ">
           <h2 className="px-4">Your Dashboard</h2>
           <div className="dash-info-container py-2" >
-            <div className="dash-info-box " data-aos="fade-up" >
+            <div className="dash-info-box" data-aos="fade-up" >
               <div className="dash-info-icon grid p-4">
                 <i className="bi bi-grid-fill  fs-4 grid-icon"></i>
               </div>
@@ -158,17 +158,27 @@ const Dashboard = () => {
                         <div className={`sample-preview-card p-4 border rounded-4 shadow ${item.theme}`}>
                           <hr className='card-stripe' />
                           <div className="align-items-center card-logo shadow p-2  mb-3">
-                            {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                width={200}
-                                className="img-fluid"
-                              />
+{
+  item.image ? (
+    <>
+      <p style={{ color: "red", fontSize: "12px" }}>
+        {item.image}
+      </p>
 
-                            ) : (
-                              <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
-                            )}
+      <img
+        src={item.image}
+        alt={item.name}
+        width={200}
+        className="img-fluid"
+      />
+    </>
+  ) : (
+    <span className="fw-bold fs-5 text-dark p-2">
+      {item.name}
+    </span>
+  )
+}
+
                           </div>
                           <span className='fw-bold fs-5 card-text-wrap'>{item.name}</span><br />
                           <span className='text-info card-text-wrap'>{item.job}</span><br />
@@ -208,8 +218,8 @@ const Dashboard = () => {
                           <p className='text-dark'>Created at: {item.created_at}</p>
                         </div>
                         <div className="envelope-buttons">
-                          <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-lg-5" state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <Link to={'/'} className="btn btn-outline-info text-dark">Create New</Link>
+                          <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2 " state={{ cardData: item, image: item.image }}> View Card</Link>
+                          <Link to={'/'} className="btn btn-outline-info text-dark mt-2">Create New</Link>
                         </div>
                       </div>
 
@@ -248,7 +258,7 @@ const Dashboard = () => {
       </div>
 
       <div className="temp-dash-container py-3">
-        <h2 className="px-4">Create New One</h2>
+        <h2 className="p-4">Create New One</h2>
 
         <div className="templates-dash-container py-2">
           <div className="templates-box dash-blue" data-aos="fade-up">

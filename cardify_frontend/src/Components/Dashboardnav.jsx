@@ -76,11 +76,11 @@ const Dashboardnav = () => {
               <div className="d-flex ms-auto auth-buttons py-4 gap-4 d-flex justify-content-center align-items-center">
                 {isLoggedIn ? (
                   <>
-                    <div className="username align-items-center me-2 py-2 px-3">
+                    <div className="username align-items-center me-2 py-2 px-5">
                       <i className="bi bi-person-circle me-2 fs-5"></i>
                       <span className='text-white   border-rounded rounded-4 fs-5'>{username}</span>
                     </div>
-                    <button className="btn btn-outline-danger rounded-4 me-lg-5 py-2 px-3 fs-5" onClick={handleLogout}>Logout<i className="bi bi-box-arrow-right ms-2 fs-5"></i></button>
+                    <button className="btn btn-outline-danger rounded-4 me-lg-3 py-2 fs-5" onClick={handleLogout}>Logout<i className="bi bi-box-arrow-right ms-2 fs-5"></i></button>
 
 
 

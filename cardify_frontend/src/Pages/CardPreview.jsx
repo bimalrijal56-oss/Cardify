@@ -6,6 +6,28 @@ import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 
+const API_BASE_URL = 'https://cardify-production-6e02.up.railway.app';
+
+const resolveImageSrc = (image) => {
+    if (!image) {
+        return '';
+    }
+
+    if (image instanceof File) {
+        return URL.createObjectURL(image);
+    }
+
+    if (typeof image === 'string' && image.startsWith('http')) {
+        return image;
+    }
+
+    if (typeof image === 'string') {
+        return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+    }
+
+    return '';
+};
+
 
 const CardPreview = () => {
 
@@ -53,7 +75,7 @@ const CardPreview = () => {
 
                             <h1 className="hero-subtitle"> Get A Look OF Your</h1>
                             <h1 className="hero-subtitle text-info">Business Card <i class="bi bi-arrow-down"></i></h1>
-                            <p className="hero-description">Yor card is generated according to your specification,have a look and share or save according to need.</p>
+                            <p className="hero-description text-white">Yor card is generated according to your specification,have a look and share or save according to need.</p>
                         </div>
                     </div>
                 </div>
@@ -70,7 +92,7 @@ const CardPreview = () => {
                                 <hr className='card-stripe' />
                                 <div className="align-items-center card-logo shadow p-2  mb-3">
                                     {image ? (
-                                        <img src={image instanceof File ? URL.createObjectURL(image) : image} alt={cardData?.name} width={200} className="img-fluid "></img>
+                                        <img src={resolveImageSrc(image)} alt={cardData?.name} width={200} className="img-fluid "></img>
 
                                     ) : (
                                         <span className='fw-bold fs-5 text-dark p-2 '>{cardData?.name}</span>
