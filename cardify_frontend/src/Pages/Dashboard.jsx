@@ -158,27 +158,17 @@ const Dashboard = () => {
                         <div className={`sample-preview-card p-4 border rounded-4 shadow ${item.theme}`}>
                           <hr className='card-stripe' />
                           <div className="align-items-center card-logo shadow p-2  mb-3">
-{
-  item.image ? (
-    <>
-      <p style={{ color: "red", fontSize: "12px" }}>
-        {item.image}
-      </p>
+                            {item.image ? (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                width={200}
+                                className="img-fluid"
+                              />
 
-      <img
-        src={item.image}
-        alt={item.name}
-        width={200}
-        className="img-fluid"
-      />
-    </>
-  ) : (
-    <span className="fw-bold fs-5 text-dark p-2">
-      {item.name}
-    </span>
-  )
-}
-
+                            ) : (
+                              <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
+                            )}
                           </div>
                           <span className='fw-bold fs-5 card-text-wrap'>{item.name}</span><br />
                           <span className='text-info card-text-wrap'>{item.job}</span><br />
