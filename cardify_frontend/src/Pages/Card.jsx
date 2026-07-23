@@ -9,9 +9,9 @@ const Card = () => {
     // const { cardData, image } = location.state || {};
 
     const [cardData, setCardData] = useState(null);
-    const cardlink = `http://localhost:5173/card/${cardData?.uuid}`;
+    const cardlink = `https://cardify-plum.vercel.app/card/${cardData?.uuid}`;
     useEffect(()=>{
-        axios.get(`http://127.0.0.1:8000/api/cards/${uuid}`)
+        axios.get(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}`)
         .then((response =>{
             setCardData(response.data);
         }))

@@ -9,10 +9,10 @@ const Dashboard = () => {
   const user_id = Number(localStorage.getItem("user_id"));
 
   const { uuid } = useParams();
-  const cardlink = `http://localhost:5173/card/${uuid}`;
+  const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
   const [cards, setCards] = useState([]);
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/cards/?format=json')
+    axios.get('https://cardify-production-6e02.up.railway.app/api/cards/?format=json')
       .then(res => setCards(res.data))
       .catch(err => console.log(err))
 

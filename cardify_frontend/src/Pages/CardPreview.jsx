@@ -16,7 +16,7 @@ const CardPreview = () => {
 
 
     const { uuid } = useParams();
-    const cardlink = `http://localhost:5173/card/${uuid}`;
+    const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
 
     const location = useLocation();
     const navigate = useNavigate();

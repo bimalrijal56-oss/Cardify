@@ -68,7 +68,7 @@ const CardDetails = () => {
     for (let pair of formData.entries()) {
     console.log(pair[0], pair[1]);
 }
-    axios.post("http://127.0.0.1:8000/api/cards/",formData,
+    axios.post("https://cardify-production-6e02.up.railway.app/api/cards/",formData,
       {
         headers:{
           "Content-Type":"multipart/form-data"
