@@ -31,8 +31,12 @@ const Card = () => {
               <hr className='card-stripe' />
               <div className="align-items-center card-logo shadow p-2  mb-3">
                 {cardData.image ? (
-                    <img 
-    src={cardData.image}
+<img 
+    src={
+      cardData.image?.startsWith("http")
+      ? cardData.image
+      : `https://cardify-production-6e02.up.railway.app${cardData.image}`
+    }
     alt={cardData.name}
     width={200}
     className="img-fluid"
