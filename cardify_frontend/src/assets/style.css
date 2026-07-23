@@ -1923,7 +1923,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("blue.png");
+  background-image: url("/blue.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1933,7 +1933,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("white.png");
+  background-image: url("/white.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1943,7 +1943,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("gold.png");
+  background-image: url("/gold.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1954,7 +1954,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("black.png");
+  background-image: url("/black.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1964,7 +1964,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("purple.png");
+  background-image: url("/purple.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1974,7 +1974,7 @@ nav .active::after {
   width: 100%;
   max-width: 654px;
   aspect-ratio: 327 / 463;
-  background-image: url("green.png");
+  background-image: url("/green.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
