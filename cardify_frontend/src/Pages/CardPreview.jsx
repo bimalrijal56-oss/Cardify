@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
+import { BsLinkedin, BsTwitterX, BsInstagram } from "react-icons/bs";
 
 const API_BASE_URL = 'https://cardify-production-6e02.up.railway.app';
 
@@ -54,16 +55,20 @@ const CardPreview = () => {
 
     const downloadCard = async () => {
         if (!cardRef.current) return;
+
+        await document.fonts.ready;
+
         const canvas = await html2canvas(cardRef.current, {
             backgroundColor: null,
-            scale: 2
+            scale: window.devicePixelRatio || 2,
+            useCORS: true,
         });
-        const imageData = canvas.toDataURL("image/png");
+
         const link = document.createElement("a");
-        link.href = imageData;
+        link.href = canvas.toDataURL("image/png");
         link.download = "BusinessCard.png";
         link.click();
-    }
+    };
 
     return (
         <>
@@ -114,15 +119,12 @@ const CardPreview = () => {
                                     <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
                                     <div className=" d-flex card-social-icons">
 
-                                        <a href={cardData?.linkedin} className="card-icons"><div className="icon-box
-              ">
-                                            <i className="bi bi-linkedin  fs-6"></i></div></a>
-                                        <a href={cardData?.twitter} className="card-icons"><div className="icon-box
-              ">
-                                            <i className="bi bi-twitter  fs-6"></i></div></a>
-                                        <a href={cardData?.instagram} className="card-icons"><div className="icon-box
-              ">
-                                            <i className="bi bi-instagram  fs-6"></i></div></a>
+                                        <a href={cardData?.linkedin} className="card-icons"><div className="icon-box">
+                                            <BsLinkedin /></div></a>
+                                        <a href={cardData?.twitter} className="card-icons"><div className="icon-box">
+                                            <BsTwitterX /></div></a>
+                                        <a href={cardData?.instagram} className="card-icons"><div className="icon-box">
+                                            <BsInstagram /></div></a>
                                     </div>
 
                                 </div>

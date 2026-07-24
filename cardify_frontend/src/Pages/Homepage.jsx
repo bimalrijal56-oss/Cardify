@@ -23,7 +23,6 @@ const Homepage = () => {
   const [isVideoOpen,setIsVideoOpen]= useState(false);
 
 
-
   return (
     <>
       <section className='hero'>

@@ -33,7 +33,7 @@ class Cards(models.Model):
     address = models.CharField(max_length=200,blank=True,null=True)
     email = models.EmailField(max_length=100,blank=True,null=True)
     tel = models.CharField(max_length=10,blank=True,null=True)
-    image = models.ImageField(upload_to='static/Cards',blank=True,null=True)
+    image = models.ImageField(upload_to='Cards/', blank=True, null=True)
     web_url= models.URLField(null=True,blank=True)
     fb_link =models.URLField(null=True,blank=True)
     insta_link=models.URLField(null=True,blank=True)
