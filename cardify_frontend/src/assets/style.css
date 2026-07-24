@@ -408,8 +408,11 @@ nav .active::after {
 .card-logo {
   height: 60px;
   width: 60px;
-  border-radius: 50%
+  border-radius: 50%;
+  object-fit: cover!important;
 }
+
+
 
 .icon-box {
   width: 25px;

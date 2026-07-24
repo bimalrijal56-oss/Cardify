@@ -3,19 +3,9 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import QRCode from "react-qr-code";
 
-const API_BASE_URL = 'https://cardify-production-6e02.up.railway.app';
 
-const resolveImageSrc = (image) => {
-  if (!image) {
-    return '';
-  }
 
-  if (image.startsWith('http')) {
-    return image;
-  }
 
-  return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
-};
 
 const Card = () => {
   const location = useLocation();
@@ -46,10 +36,10 @@ const Card = () => {
             <div className="align-items-center card-logo shadow p-2  mb-3">
               {cardData.image ? (
                 <img
-                  src={resolveImageSrc(cardData.image)}
+                  src={(cardData.image)}
                   alt={cardData.name}
                   width={200}
-                  className="img-fluid"
+                  className="img-fluid border rounded-3"
                 />
 
               ) : (

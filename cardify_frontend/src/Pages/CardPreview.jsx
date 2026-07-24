@@ -97,7 +97,7 @@ const CardPreview = () => {
                                 <hr className='card-stripe' />
                                 <div className="align-items-center card-logo shadow p-2  mb-3">
                                     {image ? (
-                                        <img src={resolveImageSrc(image)} alt={cardData?.name} width={200} className="img-fluid "></img>
+                                        <img src={resolveImageSrc(image)} alt={cardData?.name} width={200} className="img-fluid border rounded-3"></img>
 
                                     ) : (
                                         <span className='fw-bold fs-5 text-dark p-2 '>{cardData?.name}</span>
