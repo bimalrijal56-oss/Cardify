@@ -573,6 +573,14 @@ nav .active::after {
   justify-content: center;
 }
 
+.dash-username{
+    border: 1px solid var(--text);
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+
+}
+
 .counter-text {
   color: rgba(255, 255, 255, .4);
   font-weight: bold;
@@ -1894,6 +1902,11 @@ align-items:stretch;
 .people {
   background: #ff44002d;
 }
+
+.clicks{
+  background:#00c8532d;
+}
+
 
 .view-button {
   display: flex;

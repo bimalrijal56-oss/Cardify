@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import QRCode from "react-qr-code";
 import { toast, ToastContainer } from "react-toastify";
 import Counter from '../Components/Counter';
+import { BsArrowUpLeft, BsArrowUpRight } from 'react-icons/bs';
 
 
 const Dashboard = () => {
@@ -57,7 +58,7 @@ const Dashboard = () => {
     }
   };
 
-const cardsCount=   localStorage.getItem("cardsCount");
+const cardsCount = filteredCards.length;
 const username = localStorage.getItem("username");
 
 
@@ -77,32 +78,20 @@ useEffect(()=>{
   return (
     <>
       <div className="dash-page">
-        <div className="col-md-12">
+      <div className="row">
+            <div className="col-md-12 d-flex justify-content-between  align-items-center">
           <div className="d-flex flex-column fw-bold">
             <h1 className="">Welcome back,{username}!! 👋</h1>
             <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
           </div>
-          <div className="dash-logo">
-          {/*             {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                width={200}
-                                className="img-fluid"
-                              />
-
-                            ) : (
-                              <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
-                            )} */}
-
-          </div>
 
         </div>
+      </div>
 
 
 
 
-        <div className="dash-info col-md-12 d-flex-column justify-content-center align-items-center py-2 ">
+        <div className="dash-info col-md-12 d-flex-column justify-content-center align-items-center py-5 ">
           <h2 className="px-4">Your Dashboard</h2>
           <div className="dash-info-container py-2" >
             <div className="dash-info-box" data-aos="fade-up" >
@@ -151,8 +140,10 @@ useEffect(()=>{
             
             <div className="dash-info-box" data-aos="fade-up">
 
-              <div className="dash-info-icon people p-4">
-                <i className="bi bi-people-fill  fs-4 people-icon"></i>
+              <div className="dash-info-icon clicks p-4">
+                <div style={{fontSize:"30px", color:"white"}}>
+  <BsArrowUpLeft color="#22c55e" size={28} />
+</div>
               </div>
               <div className="px-4 dash-info-text">
                 <div className="row wrapper">

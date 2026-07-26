@@ -80,9 +80,10 @@ const deleteCard = async (uuid,toastId)=>{
         </div>
       </section>
 
+
       <div className="container my-4">
         <div className="row">
-          <div className="col-12  d-flex justify-content-between  align-items-centersearch-header">
+          <div className="col-12  d-flex justify-content-between  align-items-center search-header">
 
             <div className="search-container">
               <input type="text" className="search-input" placeholder="Search cards..." onChange={(e) => setSearch(e.target.value)} ></input>
