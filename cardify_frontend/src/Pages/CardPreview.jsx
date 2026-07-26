@@ -7,7 +7,9 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import { BsLinkedin, BsTwitterX, BsInstagram } from "react-icons/bs";
 
-const API_BASE_URL = 'https://cardify-production-6e02.up.railway.app';
+const API_BASE_URL = import.meta.env.DEV
+    ? 'http://127.0.0.1:8000'
+    : 'https://cardify-production-6e02.up.railway.app';
 
 const resolveImageSrc = (image) => {
     if (!image) {
