@@ -209,7 +209,7 @@ const Dashboard = () => {
                         </div>
                         <div className="envelope-buttons">
                           <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2 " state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <Link to={'/'} className="btn btn-outline-info text-dark mt-2">Create New</Link>
+                          <Link to={'/'} className="btn btn-outline-danger text-dark mt-2">Delete Card</Link>
                         </div>
                       </div>
 

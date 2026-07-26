@@ -4,8 +4,10 @@ import QRCode from "react-qr-code";
 import AOS from "aos";
 import { Link, useParams } from 'react-router-dom';
 import Dashboardnav from '../Components/Dashboardnav';
+import { toast, ToastContainer } from "react-toastify";
 
 const Cardlist = () => {
+
   const { uuid } = useParams();
   const user_id = Number(localStorage.getItem("user_id"));
   const [cards, setCards] = useState([]);
@@ -25,7 +27,27 @@ const Cardlist = () => {
 
 
 
+const handleDelete = async (uuid)=>{
 
+  const confirmDelete = window.confirm("Are you sure you want to delete this card?");
+
+  if(!confirmDelete){
+    return;
+  }
+
+  try{
+    await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
+    setCards(prevCards => prevCards.filter((card)=> card.uuid !== uuid));
+    toast.success("Card deleted successfully",{className:'toast-success-glow'});
+  }
+
+  catch(error){
+    console.log(error);
+    toast.error("Failed to delete card",{className:'toast-error-glow'});
+  }
+   
+
+};
 
 
 
@@ -47,14 +69,17 @@ const Cardlist = () => {
 
       <div className="container my-4">
         <div className="row">
-          <div className="col-12 col-md-6 col-xl-4">
+          <div className="col-12  d-flex justify-content-between  align-items-centersearch-header">
+
             <div className="search-container">
               <input type="text" className="search-input" placeholder="Search cards..." onChange={(e) => setSearch(e.target.value)} ></input>
               <div className="search-box px-2">
                 <i className="bi bi-search fs-4" ></i>
               </div>
             </div>
+            <Link to={'/'} className="btn btn-outline-info text-white mt-2">Create New</Link>
           </div>
+          
 
         </div>
 
@@ -123,7 +148,7 @@ const Cardlist = () => {
                         </div>
                         <div className="envelope-buttons">
                           <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2" state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <Link to={'/'} className="btn btn-outline-info text-dark mt-2">Create New</Link>
+                          <button className="btn btn-outline-danger text-dark mt-2" onClick={()=> handleDelete(item.uuid)}>Delete Card</button>
                         </div>
                       </div>
 

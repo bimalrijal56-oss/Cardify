@@ -9,6 +9,7 @@ urlpatterns = [
     path('users/<int:pk>', UserId.as_view()),
     path('cards/', CardsList.as_view()),
     path('cards/<uuid:uuid>/', CardByUUID.as_view()),
+    path('cards/<uuid:uuid>',CardsId.as_view()),
 ]
 
 

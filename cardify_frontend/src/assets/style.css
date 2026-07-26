@@ -1501,19 +1501,28 @@ nav .active::after {
   border: 1px solid #ccc;
 }
 
-.search-container {
-  margin-left: 50px;
-}
+
 
 @media (max-width: 768px) {
-  .search-container {
-    margin-left: 0;
-    width: 100%;
+  .search-header {
+flex-direction:column;
+gap:15px;
+align-items:stretch;
+  }
+
+  .search-container{
+    width:100%;
   }
 
   .search-input {
     width: 100%;
-    min-width: 0;
+  }
+}
+
+@media (max-width: 768px){
+  
+  .btn{
+    width:100%;
   }
 }
 

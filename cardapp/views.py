@@ -102,7 +102,8 @@ def login(request):
     
     
     
-class CardByUUID(generics.RetrieveAPIView):
+class CardByUUID(generics.RetrieveDestroyAPIView):
     queryset = Cards.objects.all()
     serializer_class = CardsSerializers
     lookup_field = 'uuid'
+    permission_classes = [permissions.AllowAny]
