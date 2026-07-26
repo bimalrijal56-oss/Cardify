@@ -23,19 +23,31 @@ const Cardlist = () => {
 
 
   const filteredCards = cards.filter(item => user_id === item.user).filter(item => item.name.toLowerCase().includes(search.toLocaleLowerCase()));
+  const cardsCount= cards.filter(item => user_id === item.user).length;
+  localStorage.setItem("cardsCount", cardsCount);
 
 
 
 
-const handleDelete = async (uuid)=>{
+const handleDelete = (uuid)=>{
 
-  const confirmDelete = window.confirm("Are you sure you want to delete this card?");
+  let toastId = toast.warning(
+    <div>
+      <p>Are you sure you want to delete this card?</p>
+      <button className='btn btn-danger btn-sm me-2' onClick={()=>deleteCard(uuid,toastId)}>Delete</button>
+      <button className='btn btn-secondary btn-sm'onClick={()=>toast.dismiss(toastId)}>Cancel</button>
+    </div>,
+    {
+      autoClose:false,
+      closeOnClick:false,
+      className:'toast-warning-glow',
+    }
+  );
+};
 
-  if(!confirmDelete){
-    return;
-  }
-
-  try{
+const deleteCard = async (uuid,toastId)=>{
+  toast.dismiss(toastId);
+   try{
     await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
     setCards(prevCards => prevCards.filter((card)=> card.uuid !== uuid));
     toast.success("Card deleted successfully",{className:'toast-success-glow'});
@@ -46,8 +58,9 @@ const handleDelete = async (uuid)=>{
     toast.error("Failed to delete card",{className:'toast-error-glow'});
   }
    
+}
 
-};
+
 
 
 

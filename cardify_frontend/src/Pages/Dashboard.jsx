@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import QRCode from "react-qr-code";
+import { toast, ToastContainer } from "react-toastify";
 
 
 const Dashboard = () => {
@@ -19,6 +20,38 @@ const Dashboard = () => {
   }, []);
 
   const filteredCards = cards.filter(item => user_id === item.user)
+
+
+  const handleDelete = (uuid) => {
+    let toastId = toast.warning(
+      <div>
+        <p>Are you sure you want to delete this card?</p>
+        <button className='btn btn-danger btn-sm me-2'onClick={()=>deleteCard(uuid,toastId)}>Delete</button>
+        <button className='btn btn-secondary btn-sm' onClick={()=>toast.dismiss(toastId)}>Cancel</button>
+      </div>,
+      {
+        autoClose:false,
+        closeOnClick:false,
+        className:'toast-warning-glow',
+      }
+    );
+  }
+
+  const deleteCard = async (uuid,toastId)=>{
+    toast.dismiss(toastId);
+    try{
+      await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
+      setCards(prevCards => prevCards.filter((card)=> card.uuid !== uuid));
+      toast.success("Card deleted sucessfully",{className:'toast-success-glow'});
+    }
+    catch(error){
+      console.log(error);
+      toast.error("Failed to delete card",{className:'toast-error-glow'});
+    }
+  };
+
+const cardsCount=   localStorage.getItem("cardsCount");
+
 
   return (
     <>
@@ -209,7 +242,7 @@ const Dashboard = () => {
                         </div>
                         <div className="envelope-buttons">
                           <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2 " state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <Link to={'/'} className="btn btn-outline-danger text-dark mt-2">Delete Card</Link>
+                          <button onClick={()=>handleDelete(item.uuid)} className="btn btn-outline-danger text-dark mt-2">Delete Card</button>
                         </div>
                       </div>
 
