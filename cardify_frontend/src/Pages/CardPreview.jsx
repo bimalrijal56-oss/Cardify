@@ -6,6 +6,7 @@ import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import { BsLinkedin, BsTwitterX, BsInstagram } from "react-icons/bs";
+import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.DEV
     ? 'http://127.0.0.1:8000'
@@ -44,15 +45,38 @@ const CardPreview = () => {
     const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
 
     const location = useLocation();
-    const navigate = useNavigate();
+const navigate = useNavigate();
 
-    const { cardData, image } = location.state || {};
-    useEffect(() => {
-        if (!location.state) {
+const [cardData, setCardData] = useState(location.state?.cardData || null);
+const [image, setImage] = useState(location.state?.image || null);
+const [loading, setLoading] = useState(!location.state);
+
+useEffect(() => {
+    if (location.state) {
+        return;
+    }
+
+    axios.get(`${API_BASE_URL}/api/cards/?uuid=${uuid}`)
+        .then(res => {
+            const found = Array.isArray(res.data)
+                ? res.data.find(c => c.uuid === uuid)
+                : res.data;
+
+            if (found) {
+                setCardData(found);
+                setImage(found.image);
+            } else {
+                toast.error("Card not found.", { className: 'toast-error-glow' });
+                navigate('/dashboard');
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            toast.error("You haven't created a card yet.", { className: 'toast-error-glow' });
             navigate('/dashboard');
-            toast.error("You haven't created a card yet. Please create a card first.", { className: 'toast-error-glow' });
-        }
-    }, [location, navigate]);
+        })
+        .finally(() => setLoading(false));
+}, [uuid, location.state, navigate]);
 
 
     const downloadCard = async () => {
@@ -121,11 +145,11 @@ const CardPreview = () => {
                                     <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
                                     <div className=" d-flex card-social-icons">
 
-                                        <a href={cardData?.linkedin} className="card-icons"><div className="icon-box">
+                                        <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
                                             <BsLinkedin /></div></a>
-                                        <a href={cardData?.twitter} className="card-icons"><div className="icon-box">
+                                        <a href={cardData?.twitter || '#'} className="card-icons"><div className="icon-box">
                                             <BsTwitterX /></div></a>
-                                        <a href={cardData?.instagram} className="card-icons"><div className="icon-box">
+                                        <a href={cardData?.instagram || '#'} className="card-icons"><div className="icon-box">
                                             <BsInstagram /></div></a>
                                     </div>
 

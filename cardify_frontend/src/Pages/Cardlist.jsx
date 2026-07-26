@@ -138,13 +138,13 @@ const deleteCard = async (uuid,toastId)=>{
                             <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
                             <div className=" d-flex">
 
-                              <a href={item.linkedin_link} className="card-icons"><div className="icon-box
+                              <a href={item.linkedin_link || '#'} className="card-icons"><div className="icon-box
               ">
                                 <i className="bi bi-linkedin  fs-6"></i></div></a>
-                              <a href={item.twitter_link} className="card-icons"><div className="icon-box
+                              <a href={item.twitter_link || '#'} className="card-icons"><div className="icon-box
               ">
                                 <i className="bi bi-twitter  fs-6"></i></div></a>
-                              <a href={item.instagram_link} className="card-icons"><div className="icon-box
+                              <a href={item.instagram_link || '#'} className="card-icons"><div className="icon-box
               ">
                                 <i className="bi bi-instagram  fs-6"></i></div></a>
                             </div>

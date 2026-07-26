@@ -42,6 +42,7 @@ class Cards(models.Model):
     theme = models.CharField(max_length=50,blank=True,null=True)
     slug = models.SlugField(max_length=60,unique=True,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    views = models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return self.title

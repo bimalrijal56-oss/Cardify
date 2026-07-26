@@ -12,6 +12,8 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.hashers import make_password, check_password
+from django.db.models import F
+from django.db.models import Sum
 # Create your views here.
 
 
@@ -49,9 +51,11 @@ class CardsId(generics.RetrieveDestroyAPIView):
     queryset =Cards.objects.all()
     serializer_class=CardsSerializers
     permission_classes=[permissions.IsAuthenticatedOrReadOnly]
+    lookup_field = 'uuid'
+    lookup_url_kwarg = "uuid"
     
     def delete(self,request,*args,**kwargs):
-        card = Cards.objects.filter(id=self.kwargs['pk'])
+        card = Cards.objects.filter(uuid=self.kwargs['uuid'])
         if card.exists():
             return self.destroy(request,*args,**kwargs)
         else:
@@ -105,5 +109,34 @@ def login(request):
 class CardByUUID(generics.RetrieveDestroyAPIView):
     queryset = Cards.objects.all()
     serializer_class = CardsSerializers
-    lookup_field = 'uuid'
+    lookup_field = "uuid"
+    lookup_url_kwarg = "uuid"
     permission_classes = [permissions.AllowAny]
+    
+    def retrieve(self,request,*args,**kwargs):
+        card = self.get_object()
+        card.views = F('views')+1
+        card.save(update_fields=['views'])
+        card.refresh_from_db()
+        serializer = self.get_serializer(card)
+        return Response(serializer.data)
+    
+    
+class DashboardStats(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        user_id = request.GET.get("user_id")
+
+        total_cards = Cards.objects.filter(user_id=user_id).count()
+
+        total_clicks = (
+            Cards.objects
+            .filter(user_id=user_id)
+            .aggregate(total=Sum("views"))
+        )["total"] or 0
+
+        return Response({
+            "total_cards": total_cards,
+            "total_clicks": total_clicks
+        })

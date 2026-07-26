@@ -15,7 +15,7 @@ const Card = () => {
   const [cardData, setCardData] = useState(null);
   const cardlink = `https://cardify-plum.vercel.app/card/${cardData?.uuid}`;
   useEffect(() => {
-    axios.get(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}`)
+    axios.get(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`)
       .then((response => {
         setCardData(response.data);
       }))
@@ -62,13 +62,13 @@ const Card = () => {
               <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
               <div className=" d-flex">
 
-                <a href={cardData.linkedin_link} className="card-icons"><div className="icon-box
+                <a href={cardData.linkedin_link || '#'} className="card-icons"><div className="icon-box
               ">
                   <i className="bi bi-linkedin  fs-6"></i></div></a>
-                <a href={cardData.twitter_link} className="card-icons"><div className="icon-box
+                <a href={cardData.twitter_link || '#'} className="card-icons"><div className="icon-box
               ">
                   <i className="bi bi-twitter  fs-6"></i></div></a>
-                <a href={cardData.instagram_link} className="card-icons"><div className="icon-box
+                <a href={cardData.instagram_link || '#'} className="card-icons"><div className="icon-box
               ">
                   <i className="bi bi-instagram  fs-6"></i></div></a>
               </div>

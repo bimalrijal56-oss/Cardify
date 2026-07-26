@@ -3,18 +3,25 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import QRCode from "react-qr-code";
 import { toast, ToastContainer } from "react-toastify";
+import Counter from '../Components/Counter';
 
 
 const Dashboard = () => {
 
   const user_id = Number(localStorage.getItem("user_id"));
-
+  
+  
   const { uuid } = useParams();
   const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
   const [cards, setCards] = useState([]);
+  
+  
   useEffect(() => {
     axios.get('https://cardify-production-6e02.up.railway.app/api/cards/?format=json')
-      .then(res => setCards(res.data))
+      .then(res => {
+        setCards(res.data);
+        
+      })
       .catch(err => console.log(err))
 
   }, []);
@@ -51,61 +58,48 @@ const Dashboard = () => {
   };
 
 const cardsCount=   localStorage.getItem("cardsCount");
+const username = localStorage.getItem("username");
+
+
+const [totalClicks, setTotalClicks]= useState(0);
+
+useEffect(()=>{
+  axios.get(`https://cardify-production-6e02.up.railway.app/dashboard-stats/?user_id=${user_id}`)
+  .then(res=>{
+    setTotalClicks(res.data.total_clicks);
+  })
+  .catch((error)=>console.log(error))
+},[user_id]);
+
+
 
 
   return (
     <>
       <div className="dash-page">
         <div className="col-md-12">
-          <div className="d-flex flex-end">
-            <h1 className="">Welcome back,!! 👋</h1>
+          <div className="d-flex flex-column fw-bold">
+            <h1 className="">Welcome back,{username}!! 👋</h1>
+            <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
+          </div>
+          <div className="dash-logo">
+          {/*             {item.image ? (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                width={200}
+                                className="img-fluid"
+                              />
+
+                            ) : (
+                              <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
+                            )} */}
 
           </div>
+
         </div>
 
 
-        <div className="py-5 slider-container d-flex justify-content-center align-items-center">
-          <div className="slider-wrapper col-md-10">
-            <div id="carouselExampleCaptions" className="carousel slide">
-              <div className="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-              </div>
-              <div className="carousel-inner">
-                <div className="carousel-item active">
-                  <img src="slider1.png" className="d-block w-100" alt="slider1" />
-                  <div className="carousel-caption d-none d-md-block">
-                    <h5>Your Dashboard, Everything in Control</h5>
-                    <p>Control and Manage your dashboard with ease.</p>
-                  </div>
-                </div>
-                <div className="carousel-item">
-                  <img src="slider2.png" className="d-block w-100" alt="slider2" />
-                  <div className="carousel-caption d-none d-md-block">
-                    <h5>Variety OF Themes</h5>
-                    <p>Explore a wide range of themes to customize your cards.</p>
-                  </div>
-                </div>
-                <div className="carousel-item">
-                  <img src="slider3.png" className="d-block w-100" alt="slider3" />
-                  <div className="carousel-caption d-none d-md-block">
-                    <h5>Easy Share Options</h5>
-                    <p>Share your cards with ease using our simple sharing options.</p>
-                  </div>
-                </div>
-              </div>
-              <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Previous</span>
-              </button>
-              <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Next</span>
-              </button>
-            </div>
-          </div>
-        </div>
 
 
         <div className="dash-info col-md-12 d-flex-column justify-content-center align-items-center py-2 ">
@@ -132,8 +126,9 @@ const cardsCount=   localStorage.getItem("cardsCount");
               </div>
               <div className="px-4 dash-info-text">
                 <div className="row wrapper">
-                  <h5 className="dash-info-title">Manage Cards</h5>
-                  <span className="dash-info-dis">Create,edit your cards with ease.</span>
+                  <h5 className="dash-info-title">Total Cards</h5>
+                  <span className="dash-info-dis text-bold fs-4"><Counter end={cardsCount}/></span>
+                  <p>Active cards</p>
                 </div>
 
               </div>
@@ -152,6 +147,21 @@ const cardsCount=   localStorage.getItem("cardsCount");
                 </div>
               </div>
             </div>
+
+            
+            <div className="dash-info-box" data-aos="fade-up">
+
+              <div className="dash-info-icon people p-4">
+                <i className="bi bi-people-fill  fs-4 people-icon"></i>
+              </div>
+              <div className="px-4 dash-info-text">
+                <div className="row wrapper">
+                  <h5 className="dash-info-title">Total Clicks</h5>
+                  <span className="dash-info-dis text-bold fs-4"><Counter end={totalClicks}/></span>
+                </div>
+              </div>
+            </div>
+            
 
           </div>
 
@@ -175,7 +185,7 @@ const cardsCount=   localStorage.getItem("cardsCount");
       </div>
 
       <div className=" py-3">
-        <h2 className="px-4">Your Cards</h2>
+        <h2 className="px-4">Recent Cards</h2>
 
         {
           filteredCards.length > 0 ? (
@@ -219,13 +229,13 @@ const cardsCount=   localStorage.getItem("cardsCount");
                             <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
                             <div className=" d-flex">
 
-                              <a href={item.linkedin_link} className="card-icons"><div className="icon-box
+                              <a href={item.linkedin_link || '#'} className="card-icons"><div className="icon-box
                   ">
                                 <i className="bi bi-linkedin  fs-6"></i></div></a>
-                              <a href={item.twitter_link} className="card-icons"><div className="icon-box
+                              <a href={item.twitter_link || '#'} className="card-icons"><div className="icon-box
                   ">
                                 <i className="bi bi-twitter  fs-6"></i></div></a>
-                              <a href={item.instagram_link} className="card-icons"><div className="icon-box
+                              <a href={item.instagram_link || '#'} className="card-icons"><div className="icon-box
                   ">
                                 <i className="bi bi-instagram  fs-6"></i></div></a>
                             </div>
