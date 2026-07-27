@@ -2,6 +2,7 @@ from django.urls import path
 from cardify import settings
 from .views import *
 from django.conf.urls.static import static
+from .views import DashboardStats
 
 
 urlpatterns = [

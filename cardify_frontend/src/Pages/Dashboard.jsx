@@ -78,13 +78,16 @@ useEffect(()=>{
   return (
     <>
       <div className="dash-page">
-      <div className="row">
-            <div className="col-md-12 d-flex justify-content-between  align-items-center">
+<div className="row g-0 mx-0">
+  <div className="col-12 px-0 dash-header d-flex justify-content-between align-items-center">
           <div className="d-flex flex-column fw-bold">
-            <h1 className="">Welcome back,{username}!! 👋</h1>
+            <h1 className="welcome-text">Welcome back,{username}!! 👋</h1>
             <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
           </div>
-
+          <div className="notification  d-flex align-items-center">
+            <Link to={'#'}><i className="bi bi-bell fs-3 text-white"></i></Link>
+            <p className="mb-0 ms-2 text-white">Notifications</p>
+          </div>
         </div>
       </div>
 
@@ -142,7 +145,7 @@ useEffect(()=>{
 
               <div className="dash-info-icon clicks p-4">
                 <div style={{fontSize:"30px", color:"white"}}>
-  <BsArrowUpLeft color="#22c55e" size={28} />
+  <BsArrowUpLeft  size={28}  className="right-arrow"/>
 </div>
               </div>
               <div className="px-4 dash-info-text">
