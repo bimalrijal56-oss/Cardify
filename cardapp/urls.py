@@ -11,7 +11,7 @@ urlpatterns = [
     path('cards/', CardsList.as_view()),
     path('cards/<uuid:uuid>/', CardByUUID.as_view()),
     path('cards/delete/<uuid:uuid>',CardsId.as_view()),
-    path("dashboard-stats/",DashboardStats.as_view()),
+    path("/api/dashboard-stats/",DashboardStats.as_view()),
 ]
 
 

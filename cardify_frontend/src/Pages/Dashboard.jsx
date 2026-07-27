@@ -5,6 +5,7 @@ import QRCode from "react-qr-code";
 import { toast, ToastContainer } from "react-toastify";
 import Counter from '../Components/Counter';
 import { BsArrowUpLeft, BsArrowUpRight } from 'react-icons/bs';
+import ClicksChart from '../Components/ClicksChart';
 
 
 const Dashboard = () => {
@@ -65,7 +66,7 @@ const username = localStorage.getItem("username");
 const [totalClicks, setTotalClicks]= useState(0);
 
 useEffect(()=>{
-  axios.get(`https://cardify-production-6e02.up.railway.app/dashboard-stats/?user_id=${user_id}`)
+  axios.get(`https://cardify-production-6e02.up.railway.app/api/dashboard-stats/?user_id=${user_id}`)
   .then(res=>{
     setTotalClicks(res.data.total_clicks);
   })
@@ -74,17 +75,16 @@ useEffect(()=>{
 
 
 
-
   return (
     <>
       <div className="dash-page">
 <div className="row g-0 mx-0">
   <div className="col-12 px-0 dash-header d-flex justify-content-between align-items-center">
-          <div className="d-flex flex-column fw-bold">
+          <div className="d-flex flex-column  ms-3">
             <h1 className="welcome-text">Welcome back,{username}!! 👋</h1>
             <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
           </div>
-          <div className="notification  d-flex align-items-center">
+<div className="notification d-flex align-items-center flex-md-column">
             <Link to={'#'}><i className="bi bi-bell fs-3 text-white"></i></Link>
             <p className="mb-0 ms-2 text-white">Notifications</p>
           </div>
@@ -129,13 +129,13 @@ useEffect(()=>{
 
             <div className="dash-info-box" data-aos="fade-up">
 
-              <div className="dash-info-icon people p-4">
-                <i className="bi bi-people-fill  fs-4 people-icon"></i>
+              <div className="dash-info-icon views p-4">
+                <i className="bi bi-eye-fill  fs-4 eye-icon"></i>
               </div>
               <div className="px-4 dash-info-text">
                 <div className="row wrapper">
-                  <h5 className="dash-info-title">Organized</h5>
-                  <span className="dash-info-dis">Everything you need is organized & secured.</span>
+                  <h5 className="dash-info-title">Total views</h5>
+                  <span className="dash-info-dis text-bold fs-4"><Counter end={totalClicks}/></span>
                 </div>
               </div>
             </div>
@@ -177,6 +177,13 @@ useEffect(()=>{
 
         </div>
       </div>
+
+<div className="dash-page">
+  <h2 className="px-4">Cards Performance</h2>
+            <div className="chart-wrapper">
+      <ClicksChart cards={filteredCards} />
+    </div>
+</div>
 
       <div className=" py-3">
         <h2 className="px-4">Recent Cards</h2>

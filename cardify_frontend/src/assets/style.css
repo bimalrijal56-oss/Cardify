@@ -58,6 +58,10 @@ body {
   color: var(--text);
   line-height: 1.6;
 }
+html,
+body {
+    overflow-x: hidden;
+}
 
 
 span,
@@ -200,12 +204,27 @@ nav .active::after {
 }
 
 @media (max-width: 576px) {
+
   .dashboard-offcanvas {
     width: min(82vw, 300px) !important;
   }
 
+  .dashboard-offcanvas .username {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .dashboard-offcanvas .btn {
+    margin-right: 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .dashboard-offcanvas .offcanvas-body {
     padding: 1rem 0.9rem;
+    overflow-x: hidden;
   }
 
   .dashboard-offcanvas .nav-link-box {
@@ -219,6 +238,7 @@ nav .active::after {
   }
 
   .dashboard-offcanvas .auth-buttons {
+    width: 100%;
     gap: 0.75rem !important;
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
@@ -1904,11 +1924,11 @@ align-items:stretch;
   background: #01a4c540;
 }
 
-.people-icon {
+.eye-icon {
   color: #ca410f;
 }
 
-.people {
+.views {
   background: #ff44002d;
 }
 
@@ -2176,4 +2196,69 @@ align-items:stretch;
     font-size: 1.5rem;
   }
 
+}
+.chart-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.chart-container {
+    width: 100%;
+    height: clamp(220px, 45vw, 320px);
+}
+
+
+
+.dash-header {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.notification {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.notification p {
+  white-space: normal;
+  margin: 0;
+}
+@media(max-width:576px){
+  .notification {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+
+.dash-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.dash-page .row {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.dash-header {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+@media(max-width:576px){
+    .notification {
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .dash-header {
+        padding-right: 0 !important;
+    }
 }
