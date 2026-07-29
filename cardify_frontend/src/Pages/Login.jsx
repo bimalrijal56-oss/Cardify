@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Formik, Field, ErrorMessage, Form } from 'formik'
 import * as Yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,9 +19,9 @@ const Login = () => {
         });
 
 
-        
-        localStorage.setItem("username",response.data.username);
-        localStorage.setItem("user_id",response.data.user_id);
+
+      localStorage.setItem("username", response.data.username);
+      localStorage.setItem("user_id", response.data.user_id);
 
 
       toast.success("Logged in Sucessfully", { className: 'toast-success-glow' },)
@@ -37,6 +39,11 @@ const Login = () => {
     }
   }
 
+  const [showPassword, setShowPassword] = useState(false);
+
+
+
+
   return (
     <Formik
       initialValues={{ uname: '', email: '', pwd: '', cpwd: '' }}
@@ -49,7 +56,7 @@ const Login = () => {
 
         pwd: Yup.string()
           .required('password is required')
-          .min(8, 'password must be 8 characters long')
+          .min(8, 'password must be 8 characters long,contain at least one uppercase letter, one lowercase letter, one number, and one special character')
           .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$*!?]).{8,}$/, 'invalid password'),
 
 
@@ -79,11 +86,30 @@ const Login = () => {
                     </ErrorMessage>
                   </div>
 
-                  <div className="form-floating mb-3">
-                    <Field type="password" id="pwd" name="pwd" placeholder="Enter your password" className="form-control" required />
-                    <label htmlFor="pwd">Password</label>
-                    <ErrorMessage name='pwd'>
-                      {(msg) => <span className='text-danger'>{msg}</span>}
+                  <div className="mb-3">
+                    <div className="form-floating position-relative">
+                      <Field
+                        type={showPassword ? 'text' : 'password'}
+                        id="pwd"
+                        name="pwd"
+                        placeholder="Enter your password"
+                        className="form-control pe-5"
+                        required
+                      />
+
+                      <label htmlFor="pwd">Password</label>
+
+                      <button
+                        type="button"
+                        className="eye-btn position-absolute top-50 end-0 translate-middle-y me-3"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+
+                    <ErrorMessage name="pwd">
+                      {(msg) => <span className="text-danger d-block mt-1">{msg}</span>}
                     </ErrorMessage>
                   </div>
 

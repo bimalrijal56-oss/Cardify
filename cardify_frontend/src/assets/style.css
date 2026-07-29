@@ -2266,3 +2266,17 @@ align-items:stretch;
         padding-right: 0 !important;
     }
 }
+
+.eye-btn {
+  color: #212529;         
+  background: transparent;
+  border: none;
+}
+
+.eye-btn:hover,
+.eye-btn:focus,
+.eye-btn:active {
+  color: #212529 !important; 
+  background: transparent !important;
+  box-shadow: none !important;
+}
