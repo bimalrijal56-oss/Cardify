@@ -73,6 +73,16 @@ useEffect(()=>{
   .catch((error)=>console.log(error))
 },[user_id]);
 
+const scrollDown = () => {
+  window.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior:'smooth',
+  });
+  toast.success('Please select the theme first', {
+  className: 'toast-success-glow'
+});
+}
+
 
 
   return (
@@ -84,9 +94,12 @@ useEffect(()=>{
             <h1 className="welcome-text">Welcome back,{username}!! 👋</h1>
             <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
           </div>
-<div className="notification d-flex align-items-center flex-md-column">
+          <div className="not-container  d-flex align-items-center flex-column me-3 ms-3 ms-md-0">
+            <div className="notification d-flex align-items-center flex-md-column">
             <Link to={'#'}><i className="bi bi-bell fs-3 text-white"></i></Link>
             <p className="mb-0 ms-2 text-white">Notifications</p>
+          </div>
+          <button className='btn btn-sm btn-outline-info' onClick={scrollDown}>Create New +</button>
           </div>
         </div>
       </div>

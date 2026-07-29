@@ -39,44 +39,46 @@ const CardPreview = () => {
     const [showQR, setShowQR] = useState(false);
 
     const cardRef = useRef(null);
+    const qrRef = useRef(null);
+
 
 
     const { uuid } = useParams();
     const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
 
     const location = useLocation();
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const [cardData, setCardData] = useState(location.state?.cardData || null);
-const [image, setImage] = useState(location.state?.image || null);
-const [loading, setLoading] = useState(!location.state);
+    const [cardData, setCardData] = useState(location.state?.cardData || null);
+    const [image, setImage] = useState(location.state?.image || null);
+    const [loading, setLoading] = useState(!location.state);
 
-useEffect(() => {
-    if (location.state) {
-        return;
-    }
+    useEffect(() => {
+        if (location.state) {
+            return;
+        }
 
-    axios.get(`${API_BASE_URL}/api/cards/?uuid=${uuid}`)
-        .then(res => {
-            const found = Array.isArray(res.data)
-                ? res.data.find(c => c.uuid === uuid)
-                : res.data;
+        axios.get(`${API_BASE_URL}/api/cards/?uuid=${uuid}`)
+            .then(res => {
+                const found = Array.isArray(res.data)
+                    ? res.data.find(c => c.uuid === uuid)
+                    : res.data;
 
-            if (found) {
-                setCardData(found);
-                setImage(found.image);
-            } else {
-                toast.error("Card not found.", { className: 'toast-error-glow' });
+                if (found) {
+                    setCardData(found);
+                    setImage(found.image);
+                } else {
+                    toast.error("Card not found.", { className: 'toast-error-glow' });
+                    navigate('/dashboard');
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                toast.error("You haven't created a card yet.", { className: 'toast-error-glow' });
                 navigate('/dashboard');
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            toast.error("You haven't created a card yet.", { className: 'toast-error-glow' });
-            navigate('/dashboard');
-        })
-        .finally(() => setLoading(false));
-}, [uuid, location.state, navigate]);
+            })
+            .finally(() => setLoading(false));
+    }, [uuid, location.state, navigate]);
 
 
     const downloadCard = async () => {
@@ -95,6 +97,37 @@ useEffect(() => {
         link.download = "BusinessCard.png";
         link.click();
     };
+
+
+    const downloadQR = async () => {
+        if (!qrRef.current) return;
+        await document.fonts.ready;
+
+        const canvas = await html2canvas(qrRef.current, {
+            backgroundColor: null,
+            scale: window.devicePixelRatio || 2,
+            useCORS: true,
+        });
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = "BusinessCardQR.png";
+        link.click();
+    };
+
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(cardlink);
+            toast.success('Link copied successfully!', {
+                className: 'toast-success-glow'
+            });
+        }
+        catch (err) {
+            toast.error('Failed to copy link', {
+                className: 'toast-error-glow'
+            });
+        }
+    }
 
     return (
         <>
@@ -177,6 +210,11 @@ useEffect(() => {
                                             </button>
                                             <input type="text" value={cardlink} readOnly></input>
 
+                                            <div className="py-2 d-md-flex justify-content-center align-items-center mt-2">
+                                                <button className='btn btn-sm btn-outline-info text-white' onClick={copyLink}> <i className="bi bi-clipboard fs-5"></i> </button>
+                                                <p className='text-white mt-2 mt-md-0 ms-2'>Copy to clipboard</p>
+                                            </div>
+
                                         </div>
                                     </div>
                                 )
@@ -196,8 +234,13 @@ useEffect(() => {
                                             <button className="close-btn" onClick={() => setShowQR(false)}>
                                                 <i className="bi bi-x-lg"></i>
                                             </button>
-                                            <div className="qr-wrapper">
+                                            <div className="qr-wrapper" ref={qrRef}>
                                                 <QRCode value={cardlink} size={256} style={{ height: "auto", maxWidth: "250px", width: "200px" }}></QRCode>
+
+                                            </div>
+                                            <div className="py-2 d-md-flex justify-content-center align-items-center mt-2">
+                                                <button className='btn btn-sm btn-outline-info text-white' onClick={downloadQR}> <i className="bi bi-download fs-5"></i> </button>
+                                                <p className='text-white mt-2 mt-md-0 ms-2'>Download QR</p>
                                             </div>
 
 
@@ -237,4 +280,4 @@ useEffect(() => {
     )
 }
 
-export default CardPreview
+export default CardPreview;

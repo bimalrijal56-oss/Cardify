@@ -585,6 +585,10 @@ nav .active::after {
   color: var(--accent-dark)
 }
 
+.loginhere:hover {
+  color: var(--accent-dark)
+}
+
 
 .username {
   border: 1px solid var(--text);

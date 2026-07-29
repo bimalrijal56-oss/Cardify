@@ -11,6 +11,7 @@ import Cardlist from './Pages/Cardlist'
 import Dashboardnav from './Components/Dashboardnav'
 import Dashboard from './Pages/Dashboard'
 import Dashboardbase from './Dashboardbase'
+import AboutUs from './Pages/AboutUs'
 
 
 
@@ -24,6 +25,7 @@ const Myroute = () => {
       <Route index element={<Homepage/>}></Route>
       <Route path='/login' element={<Login />}/>
       <Route path='/register' element={<Register />}/>
+      <Route path='/aboutus' element={<AboutUs />}/>
   
         </Route>
         <Route path="/" element={<Dashboardbase />}>

@@ -62,6 +62,7 @@ const Header = () => {
       <div className="navbar-nav mx-auto  ">
     
         <Link  className={`${location.pathname =='/'? 'active':''} nav-links text-white me-5 `} aria-current="page" to={"/"}>Home</Link>
+        <Link  className={`${location.pathname =='/aboutus'? 'active':''} nav-links text-white me-5 `} aria-current="page" to={"/aboutus"}>About Us</Link>        
  
         </div>
         <div className="d-flex ms-auto auth-buttons">

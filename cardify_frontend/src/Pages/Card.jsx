@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import QRCode from "react-qr-code";
+import { BsLinkedin, BsTwitterX, BsInstagram } from "react-icons/bs";
 
 
 
@@ -62,15 +63,12 @@ const Card = () => {
               <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
               <div className=" d-flex">
 
-                <a href={cardData.linkedin_link || '#'} className="card-icons"><div className="icon-box
-              ">
-                  <i className="bi bi-linkedin  fs-6"></i></div></a>
-                <a href={cardData.twitter_link || '#'} className="card-icons"><div className="icon-box
-              ">
-                  <i className="bi bi-twitter  fs-6"></i></div></a>
-                <a href={cardData.instagram_link || '#'} className="card-icons"><div className="icon-box
-              ">
-                  <i className="bi bi-instagram  fs-6"></i></div></a>
+                                        <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
+                                            <BsLinkedin /></div></a>
+                                        <a href={cardData?.twitter || '#'} className="card-icons"><div className="icon-box">
+                                            <BsTwitterX /></div></a>
+                                        <a href={cardData?.instagram || '#'} className="card-icons"><div className="icon-box">
+                                            <BsInstagram /></div></a>
               </div>
 
             </div>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Formik, Field, ErrorMessage, Form } from 'formik'
 import * as Yup from 'yup'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
@@ -135,6 +135,10 @@ const Register = () => {
 
                                     <div>
                                         <button type="submit" className=" submit btn btn-primary  w-50 ">Register</button>
+                                    </div>
+
+                                    <div className="py-3">
+                                        <p className='text-dark fw-bold'>Already have account? <Link to="/login" className="loginhere">Login here</Link></p>
                                     </div>
 
 

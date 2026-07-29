@@ -94,11 +94,11 @@ const Login = () => {
                     <button type="submit" className=" submit btn btn-primary  w-50">Login</button>
                   </div>
                   <div className="py-3">
-                    <p className='text-dark'>Don't have an account? <Link to="/register" className="registerhere">Register here</Link></p>
+                    <p className='text-dark fw-bold'>Don't have an account? <Link to="/register" className="registerhere">Register here</Link></p>
                     <p className="small text-muted mt-3">
                       By logging in, you agree to Cardify's <br />
-                      <Link to="#" className="text-info"> Terms</Link> &
-                      <Link to="#" className="text-info"> Privacy Policy</Link>.
+                      <Link to={"/aboutus"} className="text-info"> Terms</Link> &
+                      <Link to={"/aboutus"} className="text-info"> Privacy Policy</Link>.
                     </p>
 
                   </div>
