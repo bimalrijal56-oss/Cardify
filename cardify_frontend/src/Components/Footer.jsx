@@ -31,8 +31,8 @@ const Footer = () => {
             <div className="card-body">
               <h5 className="card-title mt-2">Connect with us</h5>
               <p className="card-text">Follow us on social media for latest news and updates.</p>
-              <a href="#" className="social-icons"><i className="bi bi-facebook"></i></a>
-              <a href="#" className="social-icons"><i className="bi bi-instagram"></i></a>
+              <a href="https://www.facebook.com/bimal.rijal.752" className="social-icons"><i className="bi bi-facebook"></i></a>
+              <a href="https://www.instagram.com/bimalrijal_17/" className="social-icons"><i className="bi bi-instagram"></i></a>
               <a href="#" className="social-icons"><i className="bi bi-twitter"></i></a>
               <a href="#" className="social-icons"><i className="bi bi-linkedin"></i></a>
             </div>

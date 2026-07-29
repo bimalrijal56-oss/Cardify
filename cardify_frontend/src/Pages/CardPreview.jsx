@@ -68,7 +68,7 @@ const CardPreview = () => {
                     setCardData(found);
                     setImage(found.image);
                 } else {
-                    toast.error("Card not found.", { className: 'toast-error-glow' });
+                    toast.error("You have to create card first.", { className: 'toast-error-glow' });
                     navigate('/dashboard');
                 }
             })
