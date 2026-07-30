@@ -40,7 +40,7 @@ const Footer = () => {
         </div>
         <hr />
         <div className="card-footer ">
-          <span className="footer-copyright">© 2025 Cardify Inc. All rights reserved.</span>
+          <span className="footer-copyright">© 2026 Cardify Inc. All rights reserved.</span>
         </div>
       </div>
 

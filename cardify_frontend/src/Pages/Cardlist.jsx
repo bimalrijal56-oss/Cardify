@@ -23,42 +23,42 @@ const Cardlist = () => {
 
 
   const filteredCards = cards.filter(item => user_id === item.user).filter(item => item.name.toLowerCase().includes(search.toLocaleLowerCase()));
-  const cardsCount= cards.filter(item => user_id === item.user).length;
+  const cardsCount = cards.filter(item => user_id === item.user).length;
   localStorage.setItem("cardsCount", cardsCount);
 
 
 
 
-const handleDelete = (uuid)=>{
+  const handleDelete = (uuid) => {
 
-  let toastId = toast.warning(
-    <div>
-      <p>Are you sure you want to delete this card?</p>
-      <button className='btn btn-danger btn-sm me-2' onClick={()=>deleteCard(uuid,toastId)}>Delete</button>
-      <button className='btn btn-secondary btn-sm'onClick={()=>toast.dismiss(toastId)}>Cancel</button>
-    </div>,
-    {
-      autoClose:false,
-      closeOnClick:false,
-      className:'toast-warning-glow',
+    let toastId = toast.warning(
+      <div>
+        <p>Are you sure you want to delete this card?</p>
+        <button className='btn btn-danger btn-sm me-2' onClick={() => deleteCard(uuid, toastId)}>Delete</button>
+        <button className='btn btn-secondary btn-sm' onClick={() => toast.dismiss(toastId)}>Cancel</button>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        className: 'toast-warning-glow',
+      }
+    );
+  };
+
+  const deleteCard = async (uuid, toastId) => {
+    toast.dismiss(toastId);
+    try {
+      await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
+      setCards(prevCards => prevCards.filter((card) => card.uuid !== uuid));
+      toast.success("Card deleted successfully", { className: 'toast-success-glow' });
     }
-  );
-};
 
-const deleteCard = async (uuid,toastId)=>{
-  toast.dismiss(toastId);
-   try{
-    await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
-    setCards(prevCards => prevCards.filter((card)=> card.uuid !== uuid));
-    toast.success("Card deleted successfully",{className:'toast-success-glow'});
-  }
+    catch (error) {
+      console.log(error);
+      toast.error("Failed to delete card", { className: 'toast-error-glow' });
+    }
 
-  catch(error){
-    console.log(error);
-    toast.error("Failed to delete card",{className:'toast-error-glow'});
   }
-   
-}
 
 
 
@@ -93,7 +93,7 @@ const deleteCard = async (uuid,toastId)=>{
             </div>
             <Link to={'/'} className="btn btn-outline-info text-white mt-2">Create New</Link>
           </div>
-          
+
 
         </div>
 
@@ -112,12 +112,12 @@ const deleteCard = async (uuid,toastId)=>{
                           <hr className='card-stripe' />
                           <div className="align-items-center card-logo shadow p-2  mb-3">
                             {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                width={200}
-                                className="img-fluid"
-                              />
+                              <div className="profile-image">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                />
+                              </div>
 
                             ) : (
                               <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
@@ -162,7 +162,7 @@ const deleteCard = async (uuid,toastId)=>{
                         </div>
                         <div className="envelope-buttons">
                           <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2" state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <button className="btn btn-outline-danger text-dark mt-2" onClick={()=> handleDelete(item.uuid)}>Delete Card</button>
+                          <button className="btn btn-outline-danger text-dark mt-2" onClick={() => handleDelete(item.uuid)}>Delete Card</button>
                         </div>
                       </div>
 

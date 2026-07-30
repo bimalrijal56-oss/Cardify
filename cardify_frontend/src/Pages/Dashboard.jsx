@@ -216,12 +216,12 @@ const scrollDown = () => {
                           <hr className='card-stripe' />
                           <div className="align-items-center card-logo shadow p-2  mb-3">
                             {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                width={200}
-                                className="img-fluid"
-                              />
+                              <div className="profile-image">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                />
+                              </div>
 
                             ) : (
                               <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>

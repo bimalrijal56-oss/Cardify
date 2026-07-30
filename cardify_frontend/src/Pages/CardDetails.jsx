@@ -364,7 +364,7 @@ const CardDetails = () => {
               <hr />
               <div className="d-flex justify-content-between">
                 <img src='qr.png' alt='qr code' height={50} width={50}></img>
-                <div className=" d-flex">
+                <div className=" d-flex py-2 gap-2">
 
                   <a href="#" className="card-icons"><div className="icon-box
               ">

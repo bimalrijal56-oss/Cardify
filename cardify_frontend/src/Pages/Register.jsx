@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Formik, Field, ErrorMessage, Form } from 'formik'
 import * as Yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 
 const Register = () => {
@@ -11,7 +12,7 @@ const Register = () => {
 
 
 
-
+ const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (values, { resetForm }) => {
 
@@ -38,7 +39,7 @@ const Register = () => {
         }
         catch (error) {
             console.log(error.response?.data || error.message)
-            toast.error( error.response?.data?.error || "Something went wrong", {
+            toast.error(error.response?.data?.error || "Something went wrong", {
                 className: 'toast-error-glow',
             })
         }
@@ -52,16 +53,16 @@ const Register = () => {
                 uname: Yup.string()
                     .required('username is required')
                     .min(3, 'username must be 3 character long')
-                    .matches(/^[a-zA-z0-9\_\.]+$/, 'username is invalid'),
+                    .matches(/^[a-zA-z0-9\_\.]+$/, 'username shouldnot contain spaces or special characters'),
 
                 email: Yup.string()
                     .required('email is required')
-                    .matches(/^([a-zA-Z])[a-zA-Z0-9\-\.\_]+\@+([a-zA-Z])+\.+([a-z])/, 'invallid email'),
+                    .matches(/^([a-zA-Z])[a-zA-Z0-9\-\.\_]+\@+([a-zA-Z])+\.+([a-z])/, 'invalid email'),
 
                 pwd: Yup.string()
                     .required('password is required')
                     .min(8, 'password must be 8 characters long')
-                    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$*!?]).{8,}$/, 'invalid password'),
+                    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$*!?]).{8,}$/, 'password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
 
                 cpwd: Yup.string()
                     .oneOf([Yup.ref('pwd')], 'password did not match')
@@ -122,11 +123,30 @@ const Register = () => {
                                         </ErrorMessage>
                                     </div>
 
-                                    <div className="form-floating mb-3">
-                                        <Field type="password" id="pwd" name="pwd" placeholder="Enter your password" className="form-control" required />
-                                        <label htmlFor="pwd">Password</label>
-                                        <ErrorMessage name='pwd'>
-                                            {(msg) => <span className='text-danger'>{msg}</span>}
+                                    <div className="mb-3">
+                                        <div className="form-floating position-relative">
+                                            <Field
+                                                type={showPassword ? 'text' : 'password'}
+                                                id="pwd"
+                                                name="pwd"
+                                                placeholder="Enter your password"
+                                                className="form-control pe-5"
+                                                required
+                                            />
+
+                                            <label htmlFor="pwd">Password</label>
+
+                                            <button
+                                                type="button"
+                                                className="eye-btn position-absolute top-50 end-0 translate-middle-y me-3"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </button>
+                                        </div>
+
+                                        <ErrorMessage name="pwd">
+                                            {(msg) => <span className="text-danger d-block mt-1">{msg}</span>}
                                         </ErrorMessage>
                                     </div>
 
@@ -138,7 +158,7 @@ const Register = () => {
                                     </div>
 
                                     <div className="py-3">
-                                        <p className='text-dark fw-bold'>Already have account? <Link to="/login" className="loginhere">Login here</Link></p>
+                                        <p className='text-dark fw-bold'>Already have account? <Link to="/login" className="loginhere text-primary">Login here</Link></p>
                                     </div>
 
 

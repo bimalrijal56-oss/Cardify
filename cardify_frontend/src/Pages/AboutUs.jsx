@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const AboutUs = () => {
   return (
@@ -64,6 +65,14 @@ If you have any questions or concerns regarding these Terms and Conditions, plea
 
         </div>
        </div>
+      <div className="i-agree py-3 d-flex justify-content-center align-items-center flex-column">
+<div className="">
+          <input type="checkbox" id="agree"  name="agree" required></input>
+        <label htmlFor="agree"className="ms-3">I agree to the Terms and Conditions</label>
+</div>
+        <Link to={"/register"} className="btn btn-outline-primary text-white ms-3">Proceed to Register</Link>
+      </div>
+
     </div>
     
 </div>

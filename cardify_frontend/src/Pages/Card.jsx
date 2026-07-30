@@ -36,15 +36,16 @@ const Card = () => {
             <hr className='card-stripe' />
             <div className="align-items-center card-logo shadow p-2  mb-3">
               {cardData.image ? (
-                <img
-                  src={(cardData.image)}
-                  alt={cardData.name}
-                  width={200}
-                  className="img-fluid border rounded-3"
-                />
-
+                <div className="profile-image">
+                  <img
+                    src={cardData.image}
+                    alt={cardData.name}
+                  />
+                </div>
               ) : (
-                <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{cardData.name}</span>
+                <span className="fw-bold fs-5 text-dark p-2 card-text-wrap">
+                  {cardData.name}
+                </span>
               )}
             </div>
             <span className='fw-bold fs-5 card-text-wrap'>{cardData.name}</span><br />
@@ -63,12 +64,12 @@ const Card = () => {
               <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
               <div className=" d-flex">
 
-                                        <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
-                                            <BsLinkedin /></div></a>
-                                        <a href={cardData?.twitter || '#'} className="card-icons"><div className="icon-box">
-                                            <BsTwitterX /></div></a>
-                                        <a href={cardData?.instagram || '#'} className="card-icons"><div className="icon-box">
-                                            <BsInstagram /></div></a>
+                <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
+                  <BsLinkedin /></div></a>
+                <a href={cardData?.twitter || '#'} className="card-icons"><div className="icon-box">
+                  <BsTwitterX /></div></a>
+                <a href={cardData?.instagram || '#'} className="card-icons"><div className="icon-box">
+                  <BsInstagram /></div></a>
               </div>
 
             </div>
