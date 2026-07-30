@@ -62,7 +62,7 @@ const Card = () => {
             <hr />
             <div className="d-flex justify-content-between">
               <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
-              <div className=" d-flex">
+              <div className=" d-flex py-2 gap-2">
 
                 <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
                   <BsLinkedin /></div></a>

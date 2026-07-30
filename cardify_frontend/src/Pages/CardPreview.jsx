@@ -160,7 +160,6 @@ const CardPreview = () => {
                                             <img
                                                 src={resolveImageSrc(image)}
                                                 alt={cardData?.name}
-                                                className="profile-image-circle"
                                             />
                                         </div>
                                     ) : (
