@@ -160,6 +160,7 @@ const CardPreview = () => {
                                             <img
                                                 src={resolveImageSrc(image)}
                                                 alt={cardData?.name}
+                                                crossOrigin="anonymous"
                                             />
                                         </div>
                                     ) : (
