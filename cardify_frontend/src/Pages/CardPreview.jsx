@@ -3,10 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from "react-toastify";
 import { useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
-import html2canvas from "html2canvas";
 import { useRef } from "react";
-import { BsLinkedin, BsTwitterX, BsInstagram } from "react-icons/bs";
+import {
+    BsLinkedin, BsTwitterX, BsInstagram,
+    BsTelephoneFill, BsEnvelopeFill, BsGlobe,
+
+} from "react-icons/bs";
 import axios from 'axios';
+import { domToPng } from "modern-screenshot";
 
 const API_BASE_URL = import.meta.env.DEV
     ? 'http://127.0.0.1:8000'
@@ -86,16 +90,26 @@ const CardPreview = () => {
 
         await document.fonts.ready;
 
-        const canvas = await html2canvas(cardRef.current, {
-            backgroundColor: null,
-            scale: window.devicePixelRatio || 2,
-            useCORS: true,
-        });
+        try {
+            const dataUrl = await domToPng(cardRef.current, {
+                backgroundColor: null,
+                scale: window.devicePixelRatio || 2,
+                fetch: {
+                    requestInit: {
+                        mode: 'cors',
+                        cache: 'no-cache',
+                    },
+                },
+            });
 
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = "BusinessCard.png";
-        link.click();
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "BusinessCard.png";
+            link.click();
+        } catch (err) {
+            console.error("Download failed:", err);
+            toast.error("Couldn't download card image.", { className: 'toast-error-glow' });
+        }
     };
 
 
@@ -103,15 +117,19 @@ const CardPreview = () => {
         if (!qrRef.current) return;
         await document.fonts.ready;
 
-        const canvas = await html2canvas(qrRef.current, {
-            backgroundColor: null,
-            scale: window.devicePixelRatio || 2,
-            useCORS: true,
-        });
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = "BusinessCardQR.png";
-        link.click();
+        try {
+            const dataUrl = await domToPng(qrRef.current, {
+                backgroundColor: null,
+                scale: window.devicePixelRatio || 2,
+            });
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "BusinessCardQR.png";
+            link.click();
+        } catch (err) {
+            console.error("QR download failed:", err);
+            toast.error("Couldn't download QR code.", { className: 'toast-error-glow' });
+        }
     };
 
 
@@ -173,12 +191,14 @@ const CardPreview = () => {
                                 <span className='text-info'>{cardData?.job}</span><br />
                                 <span className='text-secondary'>{cardData?.company}</span>
                                 <hr />
-                                <i className="bi bi-telephone-fill text-info"></i><span className='text-secondary px-3'>{cardData?.tel}</span><br />
+                               <div className="contact-row">
+                                 <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
+                               </div>
                                 <div className="contact-row">
-                                    <i className="bi bi-envelope-fill text-info"></i><span className='text-secondary px-3'>{cardData?.email}</span><br />
+                                    <BsEnvelopeFill className="text-info" /><span className='text-secondary px-3'>{cardData?.email}</span><br />
                                 </div>
                                 <div className="contact-row">
-                                    <i className="bi bi-globe text-info"></i><span className='text-secondary px-3'>{cardData?.address}</span>
+                                    <BsGlobe className="text-info" /><span className='text-secondary px-3'>{cardData?.address}</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
