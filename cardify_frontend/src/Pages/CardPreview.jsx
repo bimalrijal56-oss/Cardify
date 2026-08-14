@@ -255,16 +255,13 @@ const CardPreview = () => {
                                 <span className='text-secondary'>{cardData?.company}</span>
                                 <hr />
                                 <div className="contact-row">
-                                    <span className="contact-icon"><BsTelephoneFill className="text-info" /></span>
-                                    <span className='text-secondary'>{cardData?.tel}</span>
+                                    <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
                                 </div>
                                 <div className="contact-row">
-                                    <span className="contact-icon"><BsEnvelopeFill className="text-info" /></span>
-                                    <span className='text-secondary'>{cardData?.email}</span>
+                                    <BsEnvelopeFill className="text-info" /><span className='text-secondary px-3'>{cardData?.email}</span><br />
                                 </div>
                                 <div className="contact-row">
-                                    <span className="contact-icon"><BsGlobe className="text-info" /></span>
-                                    <span className='text-secondary'>{cardData?.address}</span>
+                                    <BsGlobe className="text-info" /><span className='text-secondary px-3'>{cardData?.address}</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
