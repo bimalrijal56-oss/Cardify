@@ -133,17 +133,27 @@ const CardPreview = () => {
         };
     }, [image]);
 
+    const waitForCardRender = async () => {
+        if (!cardRef.current) return;
+
+        const cardImage = cardRef.current.querySelector('img');
+        if (!cardImage) return;
+
+        if (cardImage.complete) return;
+
+        await new Promise((resolve, reject) => {
+            cardImage.onload = resolve;
+            cardImage.onerror = reject;
+        });
+    };
+
     const downloadCard = async () => {
         if (!cardRef.current) return;
 
-        if (image && !imageDataUrl) {
-            toast.info('Preparing your card image…', { className: 'toast-info-glow' });
-            await new Promise(resolve => setTimeout(resolve, 300));
-        }
-
-        await document.fonts.ready;
-
         try {
+            await document.fonts.ready;
+            await waitForCardRender();
+
             const canvas = await html2canvas(cardRef.current, {
                 backgroundColor: null,
                 scale: window.devicePixelRatio || 2,
@@ -245,13 +255,16 @@ const CardPreview = () => {
                                 <span className='text-secondary'>{cardData?.company}</span>
                                 <hr />
                                 <div className="contact-row">
-                                    <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
+                                    <span className="contact-icon"><BsTelephoneFill className="text-info" /></span>
+                                    <span className='text-secondary'>{cardData?.tel}</span>
                                 </div>
                                 <div className="contact-row">
-                                    <BsEnvelopeFill className="text-info" /><span className='text-secondary px-3'>{cardData?.email}</span><br />
+                                    <span className="contact-icon"><BsEnvelopeFill className="text-info" /></span>
+                                    <span className='text-secondary'>{cardData?.email}</span>
                                 </div>
                                 <div className="contact-row">
-                                    <BsGlobe className="text-info" /><span className='text-secondary px-3'>{cardData?.address}</span>
+                                    <span className="contact-icon"><BsGlobe className="text-info" /></span>
+                                    <span className='text-secondary'>{cardData?.address}</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
