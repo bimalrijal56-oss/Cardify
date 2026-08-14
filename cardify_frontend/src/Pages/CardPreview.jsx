@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from "react-toastify";
+import { useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
+import { useRef } from "react";
 import {
     BsLinkedin, BsTwitterX, BsInstagram,
     BsTelephoneFill, BsEnvelopeFill, BsGlobe,
+
 } from "react-icons/bs";
 import axios from 'axios';
 import { domToPng } from "modern-screenshot";
@@ -41,6 +44,8 @@ const CardPreview = () => {
 
     const cardRef = useRef(null);
     const qrRef = useRef(null);
+
+
 
     const { uuid } = useParams();
     const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
@@ -79,59 +84,61 @@ const CardPreview = () => {
             .finally(() => setLoading(false));
     }, [uuid, location.state, navigate]);
 
-    // Inline the profile image as a base64 data URL so domToPng doesn't
-    // need to re-fetch a (possibly CORS-blocked) remote image at download time.
+
+
+
     const [imageDataUrl, setImageDataUrl] = useState('');
-    const [imageReady, setImageReady] = useState(true); // true = nothing to wait on / finished loading
 
     useEffect(() => {
         const src = resolveImageSrc(image);
-        const objectUrlCreated = image instanceof File;
-
         if (!src) {
             setImageDataUrl('');
-            setImageReady(true);
             return;
         }
 
-        setImageReady(false);
+        let cancelled = false;
 
-        fetch(src, { mode: 'cors' })
-            .then(res => res.blob())
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setImageDataUrl(reader.result);
-                    setImageReady(true);
-                };
-                reader.onerror = () => {
-                    console.error("Failed to read image blob");
-                    setImageDataUrl(src);
-                    setImageReady(true);
-                };
-                reader.readAsDataURL(blob);
+        const inlineImage = (imgSrc) => new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                const ctx = canvas.getContext('2d');
+
+                if (!ctx) {
+                    resolve(imgSrc);
+                    return;
+                }
+
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = () => reject(new Error('Image failed to load'));
+            img.src = imgSrc;
+        });
+
+        inlineImage(src)
+            .then(dataUrl => {
+                if (!cancelled) setImageDataUrl(dataUrl);
             })
             .catch(err => {
-                // Most likely cause: the image URL isn't CORS-enabled.
-                // Falls back to the original src — domToPng may still fail
-                // on this image at download time in that case.
-                console.error("Failed to inline image (possible CORS issue):", err);
-                setImageDataUrl(src);
-                setImageReady(true);
+                console.error('Failed to inline image:', err);
+                if (!cancelled) setImageDataUrl(src);
             });
 
         return () => {
-            if (objectUrlCreated) {
-                URL.revokeObjectURL(src);
-            }
+            cancelled = true;
         };
     }, [image]);
 
     const downloadCard = async () => {
         if (!cardRef.current) return;
-        if (!imageReady) {
-            toast.info("Still preparing your card, try again in a moment.");
-            return;
+
+        if (image && !imageDataUrl) {
+            toast.info('Preparing your card image…', { className: 'toast-info-glow' });
+            await new Promise(resolve => setTimeout(resolve, 300));
         }
 
         await document.fonts.ready;
@@ -148,12 +155,12 @@ const CardPreview = () => {
                 },
             });
 
-            const link = document.createElement("a");
+            const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = "BusinessCard.png";
+            link.download = 'BusinessCard.png';
             link.click();
         } catch (err) {
-            console.error("Download failed:", err);
+            console.error('Download failed:', err);
             toast.error("Couldn't download card image.", { className: 'toast-error-glow' });
         }
     };
@@ -202,7 +209,7 @@ const CardPreview = () => {
                         <div className="infocard col-md-12 px-5">
 
                             <h1 className="hero-subtitle"> Get A Look OF Your</h1>
-                            <h1 className="hero-subtitle text-info">Business Card <i className="bi bi-arrow-down"></i></h1>
+                            <h1 className="hero-subtitle text-info">Business Card <i class="bi bi-arrow-down"></i></h1>
                             <p className="hero-description text-white">Yor card is generated according to your specification,have a look and share or save according to need.</p>
                         </div>
                     </div>
@@ -221,10 +228,7 @@ const CardPreview = () => {
                                 <div className="align-items-center card-logo shadow p-2  mb-3">
                                     {image ? (
                                         <div className="profile-image">
-                                            <img
-                                                src={imageDataUrl || resolveImageSrc(image)}
-                                                alt={cardData?.name}
-                                            />
+                                            <img src={imageDataUrl || resolveImageSrc(image)} alt={cardData?.name} />
                                         </div>
                                     ) : (
                                         <span className="fw-bold fs-5 text-dark p-2">
@@ -323,14 +327,8 @@ const CardPreview = () => {
                             }
 
                             <div className="button link-download">
-                                <button
-                                    className="#"
-                                    onClick={downloadCard}
-                                    disabled={!imageReady}
-                                    style={{ opacity: imageReady ? 1 : 0.6, cursor: imageReady ? 'pointer' : 'not-allowed' }}
-                                >
-                                    <i className="bi bi-download text-info fs-2 me-4"></i>
-                                    {imageReady ? 'Download Card' : 'Preparing...'}
+                                <button className="#" onClick={downloadCard}>
+                                    <i className="bi bi-download text-info fs-2 me-4"></i>Download Card
                                 </button>
                             </div>
 
@@ -340,11 +338,19 @@ const CardPreview = () => {
                                 </Link>
                             </div>
 
+
+
+
                         </div>
 
                     </div>
                 </div>
             </div>
+
+
+
+
+
 
         </>
     )
