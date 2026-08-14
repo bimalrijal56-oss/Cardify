@@ -10,7 +10,7 @@ import {
 
 } from "react-icons/bs";
 import axios from 'axios';
-import { domToPng } from "modern-screenshot";
+import html2canvas from 'html2canvas';
 
 const API_BASE_URL = import.meta.env.DEV
     ? 'http://127.0.0.1:8000'
@@ -144,19 +144,16 @@ const CardPreview = () => {
         await document.fonts.ready;
 
         try {
-            const dataUrl = await domToPng(cardRef.current, {
+            const canvas = await html2canvas(cardRef.current, {
                 backgroundColor: null,
                 scale: window.devicePixelRatio || 2,
-                fetch: {
-                    requestInit: {
-                        mode: 'cors',
-                        cache: 'no-cache',
-                    },
-                },
+                useCORS: true,
+                allowTaint: false,
+                logging: false,
             });
 
             const link = document.createElement('a');
-            link.href = dataUrl;
+            link.href = canvas.toDataURL('image/png');
             link.download = 'BusinessCard.png';
             link.click();
         } catch (err) {
@@ -171,13 +168,16 @@ const CardPreview = () => {
         await document.fonts.ready;
 
         try {
-            const dataUrl = await domToPng(qrRef.current, {
+            const canvas = await html2canvas(qrRef.current, {
                 backgroundColor: null,
                 scale: window.devicePixelRatio || 2,
+                useCORS: true,
+                allowTaint: false,
+                logging: false,
             });
-            const link = document.createElement("a");
-            link.href = dataUrl;
-            link.download = "BusinessCardQR.png";
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'BusinessCardQR.png';
             link.click();
         } catch (err) {
             console.error("QR download failed:", err);
@@ -228,7 +228,11 @@ const CardPreview = () => {
                                 <div className="align-items-center card-logo shadow p-2  mb-3">
                                     {image ? (
                                         <div className="profile-image">
-                                            <img src={imageDataUrl || resolveImageSrc(image)} alt={cardData?.name} />
+                                            <img
+                                                src={imageDataUrl || resolveImageSrc(image)}
+                                                alt={cardData?.name}
+                                                crossOrigin="anonymous"
+                                            />
                                         </div>
                                     ) : (
                                         <span className="fw-bold fs-5 text-dark p-2">
