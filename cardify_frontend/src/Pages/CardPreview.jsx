@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { toast, ToastContainer } from "react-toastify";
-import { useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
-import { useRef } from "react";
 import {
     BsLinkedin, BsTwitterX, BsInstagram,
     BsTelephoneFill, BsEnvelopeFill, BsGlobe,
-
 } from "react-icons/bs";
 import axios from 'axios';
 import { domToPng } from "modern-screenshot";
@@ -44,8 +41,6 @@ const CardPreview = () => {
 
     const cardRef = useRef(null);
     const qrRef = useRef(null);
-
-
 
     const { uuid } = useParams();
     const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
@@ -84,9 +79,60 @@ const CardPreview = () => {
             .finally(() => setLoading(false));
     }, [uuid, location.state, navigate]);
 
+    // Inline the profile image as a base64 data URL so domToPng doesn't
+    // need to re-fetch a (possibly CORS-blocked) remote image at download time.
+    const [imageDataUrl, setImageDataUrl] = useState('');
+    const [imageReady, setImageReady] = useState(true); // true = nothing to wait on / finished loading
+
+    useEffect(() => {
+        const src = resolveImageSrc(image);
+        const objectUrlCreated = image instanceof File;
+
+        if (!src) {
+            setImageDataUrl('');
+            setImageReady(true);
+            return;
+        }
+
+        setImageReady(false);
+
+        fetch(src, { mode: 'cors' })
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImageDataUrl(reader.result);
+                    setImageReady(true);
+                };
+                reader.onerror = () => {
+                    console.error("Failed to read image blob");
+                    setImageDataUrl(src);
+                    setImageReady(true);
+                };
+                reader.readAsDataURL(blob);
+            })
+            .catch(err => {
+                // Most likely cause: the image URL isn't CORS-enabled.
+                // Falls back to the original src — domToPng may still fail
+                // on this image at download time in that case.
+                console.error("Failed to inline image (possible CORS issue):", err);
+                setImageDataUrl(src);
+                setImageReady(true);
+            });
+
+        return () => {
+            if (objectUrlCreated) {
+                URL.revokeObjectURL(src);
+            }
+        };
+    }, [image]);
 
     const downloadCard = async () => {
         if (!cardRef.current) return;
+        if (!imageReady) {
+            toast.info("Still preparing your card, try again in a moment.");
+            return;
+        }
 
         await document.fonts.ready;
 
@@ -156,7 +202,7 @@ const CardPreview = () => {
                         <div className="infocard col-md-12 px-5">
 
                             <h1 className="hero-subtitle"> Get A Look OF Your</h1>
-                            <h1 className="hero-subtitle text-info">Business Card <i class="bi bi-arrow-down"></i></h1>
+                            <h1 className="hero-subtitle text-info">Business Card <i className="bi bi-arrow-down"></i></h1>
                             <p className="hero-description text-white">Yor card is generated according to your specification,have a look and share or save according to need.</p>
                         </div>
                     </div>
@@ -176,9 +222,8 @@ const CardPreview = () => {
                                     {image ? (
                                         <div className="profile-image">
                                             <img
-                                                src={resolveImageSrc(image)}
+                                                src={imageDataUrl || resolveImageSrc(image)}
                                                 alt={cardData?.name}
-                                                crossOrigin="anonymous"
                                             />
                                         </div>
                                     ) : (
@@ -191,9 +236,9 @@ const CardPreview = () => {
                                 <span className='text-info'>{cardData?.job}</span><br />
                                 <span className='text-secondary'>{cardData?.company}</span>
                                 <hr />
-                               <div className="contact-row">
-                                 <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
-                               </div>
+                                <div className="contact-row">
+                                    <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
+                                </div>
                                 <div className="contact-row">
                                     <BsEnvelopeFill className="text-info" /><span className='text-secondary px-3'>{cardData?.email}</span><br />
                                 </div>
@@ -278,8 +323,14 @@ const CardPreview = () => {
                             }
 
                             <div className="button link-download">
-                                <button className="#" onClick={downloadCard}>
-                                    <i className="bi bi-download text-info fs-2 me-4"></i>Download Card
+                                <button
+                                    className="#"
+                                    onClick={downloadCard}
+                                    disabled={!imageReady}
+                                    style={{ opacity: imageReady ? 1 : 0.6, cursor: imageReady ? 'pointer' : 'not-allowed' }}
+                                >
+                                    <i className="bi bi-download text-info fs-2 me-4"></i>
+                                    {imageReady ? 'Download Card' : 'Preparing...'}
                                 </button>
                             </div>
 
@@ -289,19 +340,11 @@ const CardPreview = () => {
                                 </Link>
                             </div>
 
-
-
-
                         </div>
 
                     </div>
                 </div>
             </div>
-
-
-
-
-
 
         </>
     )

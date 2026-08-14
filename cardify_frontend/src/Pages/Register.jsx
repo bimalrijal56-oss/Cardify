@@ -12,7 +12,7 @@ const Register = () => {
 
 
 
- const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (values, { resetForm }) => {
 
@@ -48,7 +48,15 @@ const Register = () => {
     return (
 
         <Formik
-            initialValues={{ uname: '', email: '', pwd: '', cpwd: '' }}
+            initialValues={{
+                uname: '',
+                profession: '',
+                institute: '',
+                address: '',
+                email: '',
+                pwd: '',
+                cpwd: ''
+            }}
             validationSchema={Yup.object({
                 uname: Yup.string()
                     .required('username is required')
