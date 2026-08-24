@@ -14,7 +14,7 @@ import html2canvas from 'html2canvas';
 
 const API_BASE_URL = import.meta.env.DEV
     ? 'http://127.0.0.1:8000'
-    : 'https://cardify-production-6e02.up.railway.app';
+    : 'https://cardify-ge3r.onrender.com';
 
 const resolveImageSrc = (image) => {
     if (!image) {
@@ -38,51 +38,57 @@ const resolveImageSrc = (image) => {
 
 
 const CardPreview = () => {
-
     const [showLink, setShowLink] = useState(false);
     const [showQR, setShowQR] = useState(false);
 
     const cardRef = useRef(null);
     const qrRef = useRef(null);
 
-
-
     const { uuid } = useParams();
-    const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
-
     const location = useLocation();
     const navigate = useNavigate();
 
+    const user_id = Number(localStorage.getItem('user_id'));
+
     const [cardData, setCardData] = useState(location.state?.cardData || null);
     const [image, setImage] = useState(location.state?.image || null);
-    const [loading, setLoading] = useState(!location.state);
+    const [loading, setLoading] = useState(!location.state?.cardData);
+
+    const cardlink = cardData?.uuid || uuid
+        ? `${window.location.origin}/card/${cardData?.uuid || uuid}`
+        : `${window.location.origin}`;
 
     useEffect(() => {
-        if (location.state) {
+        if (location.state?.cardData) {
+            setCardData(location.state.cardData);
+            setImage(location.state.image || location.state.cardData.image);
+            setLoading(false);
             return;
         }
 
-        axios.get(`${API_BASE_URL}/api/cards/?uuid=${uuid}`)
+        setLoading(true);
+        axios.get(`${API_BASE_URL}/api/cards/?format=json`)
             .then(res => {
-                const found = Array.isArray(res.data)
-                    ? res.data.find(c => c.uuid === uuid)
-                    : res.data;
+                const allCards = Array.isArray(res.data) ? res.data : [];
+                let targetCard = null;
 
-                if (found) {
-                    setCardData(found);
-                    setImage(found.image);
-                } else {
-                    toast.error("You have to create card first.", { className: 'toast-error-glow' });
-                    navigate('/dashboard');
+                if (uuid) {
+                    targetCard = allCards.find(c => c.uuid === uuid);
+                } else if (user_id) {
+                    const userCards = allCards.filter(c => c.user === user_id);
+                    targetCard = userCards[userCards.length - 1] || null;
+                }
+
+                if (targetCard) {
+                    setCardData(targetCard);
+                    setImage(targetCard.image);
                 }
             })
             .catch(err => {
-                console.log(err);
-                toast.error("You haven't created a card yet.", { className: 'toast-error-glow' });
-                navigate('/dashboard');
+                console.error("Error fetching card data:", err);
             })
             .finally(() => setLoading(false));
-    }, [uuid, location.state, navigate]);
+    }, [uuid, user_id, location.state]);
 
 
 
@@ -211,31 +217,46 @@ const CardPreview = () => {
     }
 
     return (
-        <>
-
-            <section className='hero-preview'>
-                <div className="container">
-                    <div className="row align-items-center">
-                        <div className="infocard col-md-12 px-5">
-
-                            <h1 className="hero-subtitle"> Get A Look OF Your</h1>
-                            <h1 className="hero-subtitle text-info">Business Card <i class="bi bi-arrow-down"></i></h1>
-                            <p className="hero-description text-white">Yor card is generated according to your specification,have a look and share or save according to need.</p>
-                        </div>
-                    </div>
+        <div className="page-white-theme">
+            {/* Clean Topbar Header */}
+            <div className="dash-topbar mb-4">
+                <div>
+                    <h1 className="dash-welcome-title">Business Card Preview</h1>
+                    <p className="dash-welcome-sub">
+                        Your digital card is ready. Preview, share link, or download your high-resolution card & QR code.
+                    </p>
                 </div>
-            </section>
 
-            <div className="container">
+                <div className="dash-topbar-actions">
+                    <Link to="/card-details" className="dash-btn-create">
+                        <i className="bi bi-plus-lg me-1"></i>
+                        <span>Create Another Card</span>
+                    </Link>
+                </div>
+            </div>
 
-                <div className="row">
-
-                    <div className="outerline-card col-md-7 py-5">
-
-                        <div className="col-md-6 ">
-                            <div className={`sample-preview-card p-4 border rounded-4 shadow ${cardData?.theme}`} ref={cardRef}>
+            {loading ? (
+                <div className="p-5 text-center bg-white border rounded-4">
+                    <div className="spinner-border text-primary mb-3" role="status"></div>
+                    <p className="text-muted mb-0">Loading your card preview...</p>
+                </div>
+            ) : !cardData ? (
+                <div className="empty-state-white">
+                    <h4 className="fw-bold text-dark mb-2">No Card Selected</h4>
+                    <p className="text-muted mb-4">You haven't created a business card yet. Create your first card in seconds.</p>
+                    <Link to="/card-details" className="dash-btn-create d-inline-flex">
+                        <i className="bi bi-plus-lg me-1"></i>
+                        <span>Create Your First Card</span>
+                    </Link>
+                </div>
+            ) : (
+                <div className="row g-4 align-items-start">
+                    {/* Left: Card Render */}
+                    <div className="col-12 col-lg-7 d-flex justify-content-center">
+                        <div className="card-item-white-box w-100 d-flex justify-content-center p-4">
+                            <div className={`sample-preview-card p-4 border rounded-4 shadow ${cardData?.theme || 'blue'}`} ref={cardRef}>
                                 <hr className='card-stripe' />
-                                <div className="align-items-center card-logo shadow p-2  mb-3">
+                                <div className="align-items-center card-logo shadow p-2 mb-3">
                                     {image ? (
                                         <div className="profile-image">
                                             <img
@@ -246,128 +267,137 @@ const CardPreview = () => {
                                         </div>
                                     ) : (
                                         <span className="fw-bold fs-5 text-dark p-2">
-                                            {cardData?.name}
+                                            {cardData?.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
                                         </span>
                                     )}
                                 </div>
-                                <span className='fw-bold fs-5 '>{cardData?.name}</span><br />
-                                <span className='text-info'>{cardData?.job}</span><br />
-                                <span className='text-secondary'>{cardData?.company}</span>
+                                <span className='fw-bold fs-5 text-white'>{cardData?.name}</span><br />
+                                {cardData?.job && (
+                                    <>
+                                        <span className='text-info'>{cardData.job}</span><br />
+                                    </>
+                                )}
+                                {cardData?.company && (
+                                    <span className='text-white-50 small'>{cardData.company}</span>
+                                )}
                                 <hr />
-                                <div className="contact-row">
-                                    <BsTelephoneFill className="text-info" /><span className='text-secondary px-3'>{cardData?.tel}</span><br />
-                                </div>
-                                <div className="contact-row">
-                                    <BsEnvelopeFill className="text-info" /><span className='text-secondary px-3'>{cardData?.email}</span><br />
-                                </div>
-                                <div className="contact-row">
-                                    <BsGlobe className="text-info" /><span className='text-secondary px-3'>{cardData?.address}</span>
-                                </div>
+                                {cardData?.tel && (
+                                    <div className="contact-row mb-1">
+                                        <BsTelephoneFill className="text-info me-2" />
+                                        <span className='text-white-50 small'>{cardData.tel}</span>
+                                    </div>
+                                )}
+                                {cardData?.email && (
+                                    <div className="contact-row mb-1">
+                                        <BsEnvelopeFill className="text-info me-2" />
+                                        <span className='text-white-50 small'>{cardData.email}</span>
+                                    </div>
+                                )}
+                                {cardData?.address && (
+                                    <div className="contact-row mb-1">
+                                        <BsGlobe className="text-info me-2" />
+                                        <span className='text-white-50 small'>{cardData.address}</span>
+                                    </div>
+                                )}
                                 <hr />
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
-                                    <div className=" d-flex card-social-icons">
-
-                                        <a href={cardData?.linkedin || '#'} className="card-icons"><div className="icon-box">
-                                            <BsLinkedin /></div></a>
-                                        <a href={cardData?.twitter || '#'} className="card-icons"><div className="icon-box">
-                                            <BsTwitterX /></div></a>
-                                        <a href={cardData?.instagram || '#'} className="card-icons"><div className="icon-box">
-                                            <BsInstagram /></div></a>
+                                    <div className="bg-white p-1 rounded-2 shadow-sm">
+                                        <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
                                     </div>
-
+                                    <div className="d-flex card-social-icons gap-2">
+                                        {(cardData?.linkedin_link || cardData?.linkedin) && (
+                                            <a href={cardData.linkedin_link || cardData.linkedin} target="_blank" rel="noreferrer" className="card-icons">
+                                                <div className="icon-box"><BsLinkedin /></div>
+                                            </a>
+                                        )}
+                                        {(cardData?.twitter_link || cardData?.twitter) && (
+                                            <a href={cardData.twitter_link || cardData.twitter} target="_blank" rel="noreferrer" className="card-icons">
+                                                <div className="icon-box"><BsTwitterX /></div>
+                                            </a>
+                                        )}
+                                        {(cardData?.insta_link || cardData?.instagram) && (
+                                            <a href={cardData.insta_link || cardData.instagram} target="_blank" rel="noreferrer" className="card-icons">
+                                                <div className="icon-box"><BsInstagram /></div>
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
 
-                    <div className="preview-outline col-md-5 py-5">
-                        <div className=" preview-buttons d-flex flex-column justify-content-center align-items-center py-5">
+                    {/* Right: Actions */}
+                    <div className="col-12 col-lg-5">
+                        <div className="builder-form-card">
+                            <h4 className="fw-bold text-dark mb-3">Quick Actions</h4>
 
-                            <div className="button link-share">
-                                <button className="#" onClick={() => setShowLink(true)}>
-                                    <i className="bi bi-share text-info fs-2 me-3"></i>Share through Link
+                            <div className="d-flex flex-column gap-3">
+                                <button
+                                    className="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-2 fw-semibold rounded-3"
+                                    onClick={downloadCard}
+                                >
+                                    <i className="bi bi-download"></i>
+                                    <span>Download Card Image</span>
+                                </button>
+
+                                <button
+                                    className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 py-2 fw-semibold rounded-3"
+                                    onClick={() => setShowQR(true)}
+                                >
+                                    <i className="bi bi-qr-code"></i>
+                                    <span>View & Download QR Code</span>
+                                </button>
+
+                                <button
+                                    className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 py-2 fw-semibold rounded-3"
+                                    onClick={() => setShowLink(true)}
+                                >
+                                    <i className="bi bi-share"></i>
+                                    <span>Share Card Link</span>
                                 </button>
                             </div>
-                            {
-                                showLink && (
-                                    <div className="showlink-overlay">
-                                        <div className="showlink">
-                                            <button className="close-btn" onClick={() => setShowLink(false)}>
-                                                <i className="bi bi-x-lg"></i>
+
+                            {showLink && (
+                                <div className="showlink-overlay">
+                                    <div className="showlink">
+                                        <button className="close-btn" onClick={() => setShowLink(false)}>
+                                            <i className="bi bi-x-lg"></i>
+                                        </button>
+                                        <input type="text" value={cardlink} readOnly />
+                                        <div className="py-2 d-flex justify-content-center align-items-center mt-2 gap-2">
+                                            <button className='btn btn-sm btn-primary' onClick={copyLink}>
+                                                <i className="bi bi-clipboard me-1"></i> Copy Link
                                             </button>
-                                            <input type="text" value={cardlink} readOnly></input>
-
-                                            <div className="py-2 d-md-flex justify-content-center align-items-center mt-2">
-                                                <button className='btn btn-sm btn-outline-info text-white' onClick={copyLink}> <i className="bi bi-clipboard fs-5"></i> </button>
-                                                <p className='text-white mt-2 mt-md-0 ms-2'>Copy to clipboard</p>
-                                            </div>
-
                                         </div>
                                     </div>
-                                )
-                            }
+                                </div>
+                            )}
 
-
-                            <div className="button link-qr">
-                                <button className="#" onClick={() => setShowQR(true)}>
-                                    <i className="bi bi-qr-code text-info fs-3 me-3"></i>Share through QR
-                                </button>
-                            </div>
-
-                            {
-                                showQR && (
-                                    <div className="showqr-overlay">
-                                        <div className="showqr">
-                                            <button className="close-btn" onClick={() => setShowQR(false)}>
-                                                <i className="bi bi-x-lg"></i>
+                            {showQR && (
+                                <div className="showqr-overlay">
+                                    <div className="showqr">
+                                        <button className="close-btn" onClick={() => setShowQR(false)}>
+                                            <i className="bi bi-x-lg"></i>
+                                        </button>
+                                        <div className="qr-wrapper bg-white p-3 rounded-3" ref={qrRef}>
+                                            <QRCode value={cardlink} size={256} style={{ height: "auto", maxWidth: "250px", width: "200px" }} />
+                                        </div>
+                                        <div className="py-2 d-flex justify-content-center align-items-center mt-3">
+                                            <button className='btn btn-sm btn-primary' onClick={downloadQR}>
+                                                <i className="bi bi-download me-1"></i> Download QR Image
                                             </button>
-                                            <div className="qr-wrapper" ref={qrRef}>
-                                                <QRCode value={cardlink} size={256} style={{ height: "auto", maxWidth: "250px", width: "200px" }}></QRCode>
-
-                                            </div>
-                                            <div className="py-2 d-md-flex justify-content-center align-items-center mt-2">
-                                                <button className='btn btn-sm btn-outline-info text-white' onClick={downloadQR}> <i className="bi bi-download fs-5"></i> </button>
-                                                <p className='text-white mt-2 mt-md-0 ms-2'>Download QR</p>
-                                            </div>
-
-
                                         </div>
                                     </div>
-
-                                )
-                            }
-
-                            <div className="button link-download">
-                                <button className="#" onClick={downloadCard}>
-                                    <i className="bi bi-download text-info fs-2 me-4"></i>Download Card
-                                </button>
-                            </div>
-
-                            <div className="button link-create ">
-                                <Link to="/dashboard">
-                                    <i className="bi bi-plus text-info fs-2 me-3"></i>Create New Card
-                                </Link>
-                            </div>
-
-
-
-
+                                </div>
+                            )}
                         </div>
-
                     </div>
                 </div>
-            </div>
-
-
-
-
-
-
-        </>
-    )
-}
+            )}
+        </div>
+    );
+};
 
 export default CardPreview;
+
+

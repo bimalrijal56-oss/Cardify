@@ -1,103 +1,108 @@
 import React from 'react';
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from 'recharts';
 
-const INFO_COLOR = '#0dcaf0';
-
 const ClicksChart = ({ cards = [] }) => {
-  const data = cards.map((card) => ({
-    name: card.name || `Card ${card.uuid}`,
-    views: card.views || 0,
-  }));
+  const totalViews = cards.reduce((acc, card) => acc + (Number(card.views) || 0), 0);
 
-  if (data.length === 0) {
-    return (
-<div
-  style={{
-    width: '100%',
-    maxWidth: '100%',
-    margin: '0 auto',
-    overflow: 'hidden',
-    background: '#111417',
-    border: '1px solid #1f2933',
-    borderRadius: '16px',
-    padding: 'clamp(12px, 3vw, 24px)',
-    boxSizing: 'border-box',
-  }}
->
-        No card data yet
-      </div>
-    );
-  }
+  // If user has cards, distribute their real views across cards or recent days
+  const chartData =
+    cards.length > 0
+      ? cards.slice(0, 7).map((card) => ({
+          day: card.name ? (card.name.length > 8 ? card.name.slice(0, 8) + '…' : card.name) : 'Card',
+          views: Number(card.views) || 0,
+        }))
+      : [
+          { day: 'Mon', views: 0 },
+          { day: 'Tue', views: 0 },
+          { day: 'Wed', views: 0 },
+          { day: 'Thu', views: 0 },
+          { day: 'Fri', views: 0 },
+          { day: 'Sat', views: 0 },
+          { day: 'Sun', views: 0 },
+        ];
 
   return (
-    <div
-      style={{
-        width: '100%',
-        maxWidth: '100%',
-        minWidth: 0,
-        margin: '0 auto',
-        overflow: 'hidden',
-        background: '#111417',
-        border: '1px solid #1f2933',
-        borderRadius: '16px',
-        padding: 'clamp(12px, 3vw, 24px)',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div className="chart-container" style={{ width: '100%', minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height="100%" debounce={1}>
-          <BarChart
-            data={data}
-            margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+    <div className="analytics-chart-container" style={{ width: '100%', height: 210 }}>
+      {cards.length === 0 ? (
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#94a3b8',
+            fontSize: '0.85rem',
+            textAlign: 'center',
+            padding: '1rem',
+          }}
+        >
+          <p className="mb-1 fw-medium text-secondary">No analytics recorded yet</p>
+          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+            Create and share cards to see live view performance.
+          </span>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={chartData}
+            margin={{ top: 15, right: 10, left: -20, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#1f2933" vertical={false} />
+            <defs>
+              <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.05)" vertical={false} />
             <XAxis
-              dataKey="name"
-              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
-              axisLine={{ stroke: '#1f2933' }}
+              dataKey="day"
+              tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+              axisLine={false}
               tickLine={false}
-              interval={0}
-              angle={-20}
-              textAnchor="end"
-              height={50}
             />
             <YAxis
               allowDecimals={false}
-              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
-              axisLine={{ stroke: '#1f2933' }}
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              axisLine={false}
               tickLine={false}
               width={30}
             />
             <Tooltip
-              cursor={{ fill: 'rgba(13, 202, 240, 0.08)' }}
               contentStyle={{
-                background: '#181c20',
-                border: '1px solid #1f2933',
-                borderRadius: 8,
-                fontSize: 12,
-                color: '#fff',
+                background: '#0f172a',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#ffffff',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
               }}
-              labelStyle={{ color: '#fff' }}
+              itemStyle={{ color: '#60a5fa' }}
+              labelStyle={{ color: '#cbd5e1', fontWeight: 600 }}
             />
-            <Bar dataKey="views" radius={[4, 4, 0, 0]} maxBarSize={40}>
-              {data.map((_, index) => (
-                <Cell key={index} fill={INFO_COLOR} />
-              ))}
-            </Bar>
-          </BarChart>
+            <Area
+              type="monotone"
+              dataKey="views"
+              stroke="#2563eb"
+              strokeWidth={2.5}
+              fillOpacity={1}
+              fill="url(#colorViews)"
+              dot={{ r: 3, fill: '#2563eb', strokeWidth: 1, stroke: '#ffffff' }}
+              activeDot={{ r: 6, fill: '#1d4ed8', stroke: '#ffffff', strokeWidth: 2 }}
+            />
+          </AreaChart>
         </ResponsiveContainer>
-      </div>
+      )}
     </div>
   );
 };
 
-export default ClicksChart;
+export default ClicksChart;

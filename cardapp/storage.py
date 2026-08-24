@@ -1,6 +1,8 @@
 from whitenoise.storage import CompressedManifestStaticFilesStorage
 
 class SafeStaticFilesStorage(CompressedManifestStaticFilesStorage):
+    manifest_strict = False
+
     def post_process(self, *args, **kwargs):
         try:
             yield from super().post_process(*args, **kwargs)

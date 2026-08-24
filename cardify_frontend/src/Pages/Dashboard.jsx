@@ -1,398 +1,450 @@
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import QRCode from "react-qr-code";
-import { toast, ToastContainer } from "react-toastify";
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Counter from '../Components/Counter';
-import { BsArrowUpLeft, BsArrowUpRight } from 'react-icons/bs';
 import ClicksChart from '../Components/ClicksChart';
-
+import { API_BASE_URL } from '../config';
+import {
+  BsEyeFill,
+  BsCursorFill,
+  BsQrCode,
+  BsCreditCard2FrontFill,
+  BsChevronDown,
+  BsPlusLg,
+  BsShare,
+  BsTrash,
+  BsEye,
+  BsBarChartFill,
+  BsPlusCircleDotted,
+} from 'react-icons/bs';
+import {
+  FaHome,
+  FaCreditCard,
+  FaChartBar,
+  FaUsers,
+  FaThLarge,
+  FaCog,
+  FaUser,
+  FaHeadset,
+  FaCrown,
+  FaSignOutAlt,
+  FaBell,
+  FaShareAlt,
+} from 'react-icons/fa';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const user_id = Number(localStorage.getItem('user_id'));
+  const storedUsername = localStorage.getItem('username');
+  const displayName = storedUsername || 'User';
 
-  const user_id = Number(localStorage.getItem("user_id"));
-  
-  
-  const { uuid } = useParams();
-  const cardlink = `https://cardify-plum.vercel.app/card/${uuid}`;
   const [cards, setCards] = useState([]);
-  
-  
-  useEffect(() => {
-    axios.get('https://cardify-production-6e02.up.railway.app/api/cards/?format=json')
-      .then(res => {
-        setCards(res.data);
-        
-      })
-      .catch(err => console.log(err))
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [activeNav, setActiveNav] = useState('dashboard');
+  const [timeFilter, setTimeFilter] = useState('All Time');
+  const [loading, setLoading] = useState(true);
 
+  // Fetch real user cards
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${API_BASE_URL}/api/cards/?format=json`)
+      .then((res) => {
+        setCards(res.data || []);
+      })
+      .catch((err) => {
+        console.error('Error fetching cards:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const filteredCards = cards.filter(item => user_id === item.user)
+  // Fetch real user dashboard stats
+  useEffect(() => {
+    if (user_id) {
+      axios
+        .get(`${API_BASE_URL}/api/dashboard-stats/?user_id=${user_id}`)
+        .then((res) => {
+          if (res.data && res.data.total_clicks !== undefined) {
+            setTotalClicks(res.data.total_clicks);
+          }
+        })
+        .catch((error) => console.error('Error fetching stats:', error));
+    }
+  }, [user_id]);
 
+  // Filter cards strictly for current user
+  const userCards = cards.filter((item) => user_id === item.user);
+  const cardsCount = userCards.length;
+
+  // Compute real views from user's cards
+  const realTotalViews = userCards.reduce((acc, card) => acc + (Number(card.views) || 0), 0);
+  const effectiveClicks = totalClicks > 0 ? totalClicks : realTotalViews;
+  const qrScansCount = realTotalViews; // In Cardify, views increment when card QR/link is accessed
+
+  // Sort recent cards by latest created date / ID
+  const recentUserCards = [...userCards].sort((a, b) => {
+    const dateA = a.created_at ? new Date(a.created_at).getTime() : a.id || 0;
+    const dateB = b.created_at ? new Date(b.created_at).getTime() : b.id || 0;
+    return dateB - dateA;
+  });
+
+  // Top performing card by real views
+  const topCard =
+    userCards.length > 0
+      ? [...userCards].sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0))[0]
+      : null;
+
+  const handleLogout = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('user_id');
+    toast.success('Logged out successfully', { className: 'toast-success-glow' });
+    navigate('/login');
+  };
+
+  const handleShare = (uuid) => {
+    const shareUrl = `${window.location.origin}/card/${uuid}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Card link copied to clipboard!', { className: 'toast-success-glow' });
+    } else {
+      toast.info(`Card link: ${shareUrl}`);
+    }
+  };
 
   const handleDelete = (uuid) => {
     let toastId = toast.warning(
       <div>
-        <p>Are you sure you want to delete this card?</p>
-        <button className='btn btn-danger btn-sm me-2'onClick={()=>deleteCard(uuid,toastId)}>Delete</button>
-        <button className='btn btn-secondary btn-sm' onClick={()=>toast.dismiss(toastId)}>Cancel</button>
+        <p className="mb-2 text-dark">Are you sure you want to delete this card?</p>
+        <button
+          className="btn btn-danger btn-sm me-2"
+          onClick={() => deleteCard(uuid, toastId)}
+        >
+          Delete
+        </button>
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={() => toast.dismiss(toastId)}
+        >
+          Cancel
+        </button>
       </div>,
       {
-        autoClose:false,
-        closeOnClick:false,
-        className:'toast-warning-glow',
+        autoClose: false,
+        closeOnClick: false,
+        className: 'toast-warning-glow',
       }
     );
-  }
+  };
 
-  const deleteCard = async (uuid,toastId)=>{
+  const deleteCard = async (uuid, toastId) => {
     toast.dismiss(toastId);
-    try{
-      await axios.delete(`https://cardify-production-6e02.up.railway.app/api/cards/${uuid}/`);
-      setCards(prevCards => prevCards.filter((card)=> card.uuid !== uuid));
-      toast.success("Card deleted sucessfully",{className:'toast-success-glow'});
-    }
-    catch(error){
-      console.log(error);
-      toast.error("Failed to delete card",{className:'toast-error-glow'});
+    try {
+      await axios.delete(`${API_BASE_URL}/api/cards/${uuid}/`);
+      setCards((prevCards) => prevCards.filter((card) => card.uuid !== uuid));
+      toast.success('Card deleted successfully', { className: 'toast-success-glow' });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete card', { className: 'toast-error-glow' });
     }
   };
 
-const cardsCount = filteredCards.length;
-const username = localStorage.getItem("username");
-
-
-const [totalClicks, setTotalClicks]= useState(0);
-
-useEffect(()=>{
-  axios.get(`https://cardify-production-6e02.up.railway.app/api/dashboard-stats/?user_id=${user_id}`)
-  .then(res=>{
-    setTotalClicks(res.data.total_clicks);
-  })
-  .catch((error)=>console.log(error))
-},[user_id]);
-
-const scrollDown = () => {
-  window.scrollTo({
-    top: document.documentElement.scrollHeight,
-    behavior:'smooth',
-  });
-  toast.success('Please select the theme first', {
-  className: 'toast-success-glow'
-});
-}
-
-
-
   return (
     <>
-      <div className="dash-page">
-<div className="row g-0 mx-0">
-  <div className="col-12 px-0 dash-header d-flex justify-content-between align-items-center">
-          <div className="d-flex flex-column  ms-3">
-            <h1 className="welcome-text">Welcome back,{username}!! 👋</h1>
-            <p className="text-white">Design. Share. Connect. Your professional identity starts here.</p>
-          </div>
-          <div className="not-container  d-flex align-items-center flex-column me-3 ms-3 ms-md-0">
-            <div className="notification d-flex align-items-center flex-md-column">
-            <Link to={'#'}><i className="bi bi-bell fs-3 text-white"></i></Link>
-            <p className="mb-0 ms-2 text-white">Notifications</p>
-          </div>
-          <button className='btn btn-sm btn-outline-info' onClick={scrollDown}>Create New +</button>
-          </div>
+      {/* Topbar */}
+      <header className="dash-topbar">
+        <div>
+          <h1 className="dash-welcome-title">Welcome back, {displayName}! 👋</h1>
+          <p className="dash-welcome-sub">
+            Here's what's happening with your cards today.
+          </p>
         </div>
-      </div>
 
-
-
-
-        <div className="dash-info col-md-12 d-flex-column justify-content-center align-items-center py-5 ">
-          <h2 className="px-4">Your Dashboard</h2>
-          <div className="dash-info-container py-2" >
-            <div className="dash-info-box" data-aos="fade-up" >
-              <div className="dash-info-icon grid p-4">
-                <i className="bi bi-grid-fill  fs-4 grid-icon"></i>
-              </div>
-              <div className="px-4 dash-info-text">
-                <div className="row wrapper">
-                  <h5 className="dash-info-title">Overview</h5>
-                  <span className="dash-info-dis">See your cards in real time.</span>
-                </div>
-
-              </div>
-
-
-            </div>
-            <div className="dash-info-box" data-aos="fade-up">
-
-              <div className="dash-info-icon card p-4">
-                <i className="bi bi-person-vcard  fs-4  card-icon"></i>
-              </div>
-              <div className="px-4 dash-info-text">
-                <div className="row wrapper">
-                  <h5 className="dash-info-title">Total Cards</h5>
-                  <span className="dash-info-dis text-bold fs-4"><Counter end={cardsCount}/></span>
-                  <p>Active cards</p>
-                </div>
-
-              </div>
+          <div className="dash-topbar-actions">
+            {/* Notification Bell */}
+            <div
+              className="dash-notif-btn"
+              title="Notifications"
+              onClick={() => toast.info('No new notifications')}
+            >
+              <FaBell size={15} />
+              <span className="dash-notif-dot"></span>
             </div>
 
-
-            <div className="dash-info-box" data-aos="fade-up">
-
-              <div className="dash-info-icon views p-4">
-                <i className="bi bi-eye-fill  fs-4 eye-icon"></i>
-              </div>
-              <div className="px-4 dash-info-text">
-                <div className="row wrapper">
-                  <h5 className="dash-info-title">Total views</h5>
-                  <span className="dash-info-dis text-bold fs-4"><Counter end={totalClicks}/></span>
+            {/* User Profile Pill */}
+            <div className="dash-user-pill">
+              {userCards[0]?.image ? (
+                <img
+                  src={userCards[0].image}
+                  alt={displayName}
+                  className="dash-user-avatar"
+                />
+              ) : (
+                <div
+                  className="dash-user-avatar d-flex align-items-center justify-content-center bg-primary text-white fw-bold"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
-              </div>
+              )}
+              <span className="dash-user-name">{displayName}</span>
+              <BsChevronDown size={12} color="#64748b" />
             </div>
 
-            
-            <div className="dash-info-box" data-aos="fade-up">
+            {/* Create New Card Button */}
+            <Link to="/card-details" className="dash-btn-create">
+              <BsPlusLg size={13} />
+              <span>Create New Card</span>
+            </Link>
+          </div>
+        </header>
 
-              <div className="dash-info-icon clicks p-4">
-                <div style={{fontSize:"30px", color:"white"}}>
-  <BsArrowUpLeft  size={28}  className="right-arrow"/>
-</div>
-              </div>
-              <div className="px-4 dash-info-text">
-                <div className="row wrapper">
-                  <h5 className="dash-info-title">Total Clicks</h5>
-                  <span className="dash-info-dis text-bold fs-4"><Counter end={totalClicks}/></span>
-                </div>
-              </div>
+        {/* ── 4 STATS METRIC CARDS ROW ── */}
+        <section className="dash-metrics-grid">
+          {/* Card 1: Total Views */}
+          <div className="dash-metric-card views-card">
+            <div className="dash-metric-icon-box">
+              <BsEyeFill />
             </div>
-            
-
+            <div className="dash-metric-content">
+              <span className="dash-metric-label">Total Views</span>
+              <h3 className="dash-metric-value">
+                <Counter end={realTotalViews} />
+              </h3>
+              <span className="dash-metric-trend">Real-time views</span>
+            </div>
           </div>
 
+          {/* Card 2: Total Clicks */}
+          <div className="dash-metric-card clicks-card">
+            <div className="dash-metric-icon-box">
+              <BsCursorFill />
+            </div>
+            <div className="dash-metric-content">
+              <span className="dash-metric-label">Total Clicks</span>
+              <h3 className="dash-metric-value">
+                <Counter end={effectiveClicks} />
+              </h3>
+              <span className="dash-metric-trend">Total interactions</span>
+            </div>
+          </div>
 
+          {/* Card 3: QR Scans */}
+          <div className="dash-metric-card scans-card">
+            <div className="dash-metric-icon-box">
+              <BsQrCode />
+            </div>
+            <div className="dash-metric-content">
+              <span className="dash-metric-label">QR Scans</span>
+              <h3 className="dash-metric-value">
+                <Counter end={qrScansCount} />
+              </h3>
+              <span className="dash-metric-trend">Scan views</span>
+            </div>
+          </div>
 
+          {/* Card 4: Total Cards */}
+          <div className="dash-metric-card total-card">
+            <div className="dash-metric-icon-box">
+              <BsCreditCard2FrontFill />
+            </div>
+            <div className="dash-metric-content">
+              <span className="dash-metric-label">Total Cards</span>
+              <h3 className="dash-metric-value">
+                <Counter end={cardsCount} />
+              </h3>
+              <span className="dash-metric-subtext">Active cards</span>
+            </div>
+          </div>
+        </section>
 
+        {/* ── 2-COLUMN MAIN SECTION ── */}
+        <div className="dash-columns-grid">
+          {/* Left Column: Recent Cards */}
+          <section className="dash-recent-col">
+            <div className="dash-section-header">
+              <h3 className="dash-section-title">Recent Cards</h3>
+              {cardsCount > 0 && (
+                <Link to="/cardlist" className="dash-view-all-link">
+                  View All ({cardsCount})
+                </Link>
+              )}
+            </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-
-<div className="dash-page">
-  <h2 className="px-4">Cards Performance</h2>
-            <div className="chart-wrapper">
-      <ClicksChart cards={filteredCards} />
-    </div>
-</div>
-
-      <div className=" py-3">
-        <h2 className="px-4">Recent Cards</h2>
-
-        {
-          filteredCards.length > 0 ? (
-            <div className="your-cards-grid my-3">
-              {
-                filteredCards.slice(0, 3).map(item => (
-
-                  <div key={item.uuid} className="card-align" >
-
-                    <div className=" card-cover" data-aos="fade-up">
-
-                      <div className="card-envelope">
-                        <div className={`sample-preview-card p-4 border rounded-4 shadow ${item.theme}`}>
-                          <hr className='card-stripe' />
-                          <div className="align-items-center card-logo shadow p-2  mb-3">
-                            {item.image ? (
-                              <div className="profile-image">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                />
-                              </div>
-
-                            ) : (
-                              <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name}</span>
-                            )}
-                          </div>
-                          <span className='fw-bold fs-5 card-text-wrap'>{item.name}</span><br />
-                          <span className='text-info card-text-wrap'>{item.job}</span><br />
-                          <span className='text-secondary card-text-wrap'>{item.company}</span>
-                          <hr />
-                          <i className="bi bi-telephone-fill text-info"></i><span className='text-secondary px-3 card-text-wrap'>{item?.tel}</span><br />
-                          <div className="contact-row">
-                            <i className="bi bi-envelope-fill text-info"></i><span className='text-secondary px-3 card-text-wrap'>{item?.email}</span><br />
-                          </div>
-                          <div className="contact-row">
-                            <i className="bi bi-globe text-info"></i><span className='text-secondary px-3 card-text-wrap'>{item?.address}</span>
-                          </div>
-                          <hr />
-                          <div className="d-flex justify-content-between">
-                            <QRCode value={cardlink} size={256} style={{ height: "50px", maxWidth: "45px", width: "45px" }}></QRCode>
-                            <div className=" d-flex">
-
-                              <a href={item.linkedin_link || '#'} className="card-icons"><div className="icon-box
-                  ">
-                                <i className="bi bi-linkedin  fs-6"></i></div></a>
-                              <a href={item.twitter_link || '#'} className="card-icons"><div className="icon-box
-                  ">
-                                <i className="bi bi-twitter  fs-6"></i></div></a>
-                              <a href={item.instagram_link || '#'} className="card-icons"><div className="icon-box
-                  ">
-                                <i className="bi bi-instagram  fs-6"></i></div></a>
-                            </div>
-
-                          </div>
-
-
+            <div className="dash-recent-list">
+              {loading ? (
+                <div className="p-4 text-center text-muted bg-white rounded-3 border">
+                  Loading your cards...
+                </div>
+              ) : recentUserCards.length > 0 ? (
+                recentUserCards.slice(0, 4).map((item) => (
+                  <div key={item.uuid || item.id} className="recent-card-row">
+                    {/* Thumbnail */}
+                    <div className="recent-card-thumb">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name || 'Card'} />
+                      ) : (
+                        <div className={`recent-card-thumb-mini ${item.theme || 'blue'}`}>
+                          <BsCreditCard2FrontFill size={20} />
                         </div>
-
-                      </div>
-                      <div className="card-info">
-                        <div className="created-at">
-                          <p className='text-dark'>Created at: {item.created_at}</p>
-                        </div>
-                        <div className="envelope-buttons">
-                          <Link to={`/card-preview/${item.uuid}`} className="btn btn-view btn-primary text-dark me-5 mt-2 " state={{ cardData: item, image: item.image }}> View Card</Link>
-                          <button onClick={()=>handleDelete(item.uuid)} className="btn btn-outline-danger text-dark mt-2">Delete Card</button>
-                        </div>
-                      </div>
-
+                      )}
                     </div>
 
+                    {/* Info */}
+                    <div className="recent-card-info">
+                      <div className="recent-card-header-line">
+                        <h4 className="recent-card-name">{item.name || 'Untitled Card'}</h4>
+                        <span className="badge-active">Active</span>
+                      </div>
+                      <p className="recent-card-subtitle">
+                        {item.job || 'No Job Title Specified'}
+                        {item.company ? ` at ${item.company}` : ''}
+                      </p>
+                      <span className="recent-card-time">
+                        {item.created_at
+                          ? `Created ${new Date(item.created_at).toLocaleDateString()}`
+                          : 'Recently created'}
+                      </span>
+                    </div>
 
+                    {/* Actions */}
+                    <div className="recent-card-actions">
+                      <Link
+                        to={`/card-preview/${item.uuid}`}
+                        state={{ cardData: item, image: item.image }}
+                        className="recent-action-btn"
+                        title="View Card"
+                      >
+                        <BsEye size={15} />
+                      </Link>
 
+                      <button
+                        className="recent-action-btn"
+                        title="Share Card"
+                        onClick={() => handleShare(item.uuid)}
+                      >
+                        <FaShareAlt size={13} />
+                      </button>
 
+                      <button
+                        className="recent-action-btn btn-delete"
+                        title="Delete Card"
+                        onClick={() => handleDelete(item.uuid)}
+                      >
+                        <BsTrash size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div
+                  className="bg-white border rounded-4 p-4 text-center"
+                  style={{ borderColor: '#e2e8f0' }}
+                >
+                  <div className="mb-3 text-primary">
+                    <BsPlusCircleDotted size={40} />
+                  </div>
+                  <h5 className="fw-bold text-dark mb-1">No cards created yet</h5>
+                  <p className="text-muted small mb-3">
+                    Start by creating your first personalized digital visiting card.
+                  </p>
+                  <Link to="/card-details" className="dash-btn-create d-inline-flex">
+                    <BsPlusLg size={13} />
+                    <span>Create Your First Card</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </section>
 
+          {/* Right Column: Widgets */}
+          <div className="dash-widgets-col">
+            {/* Widget 1: Analytics Overview */}
+            <div className="dash-widget-box" id="analytics-overview-box">
+              <div className="dash-widget-header">
+                <h4 className="dash-widget-title">Analytics Overview</h4>
+                <div
+                  className="dash-filter-pill"
+                  onClick={() =>
+                    setTimeFilter((prev) => (prev === 'All Time' ? 'This Week' : 'All Time'))
+                  }
+                >
+                  <span>{timeFilter}</span>
+                  <BsChevronDown size={10} />
+                </div>
+              </div>
 
+              <ClicksChart cards={userCards} />
+            </div>
 
+            {/* Widget 2: Top Performing Card */}
+            <div className="dash-widget-box">
+              <div className="dash-widget-header">
+                <h4 className="dash-widget-title">Top Performing Card</h4>
+              </div>
 
+              {topCard ? (
+                <>
+                  <div className="top-card-content">
+                    <div className={`top-card-preview-mini ${topCard.theme || 'blue'}`}>
+                      {topCard.image ? (
+                        <img src={topCard.image} alt={topCard.name} />
+                      ) : (
+                        <BsCreditCard2FrontFill size={28} />
+                      )}
+                    </div>
 
+                    <div className="top-card-meta">
+                      <h4 className="top-card-name">{topCard.name || displayName}</h4>
+                      <p className="top-card-role">
+                        {topCard.job || 'Digital Card'}
+                        {topCard.company ? ` • ${topCard.company}` : ''}
+                      </p>
 
-
-
-
-
+                      <div className="top-card-stats">
+                        <div className="top-stat-item">
+                          <span className="top-stat-label">Views</span>
+                          <span className="top-stat-val">
+                            <Counter end={Number(topCard.views) || 0} />
+                          </span>
+                        </div>
+                        <div className="top-stat-item">
+                          <span className="top-stat-label">Theme</span>
+                          <span className="top-stat-val text-capitalize" style={{ fontSize: '0.9rem' }}>
+                            {topCard.theme || 'Default'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-
-                ))
-              }
-              <div className="">
-                <Link to="/cardlist" className="view-button btn-outline-info">View All</Link>
-              </div>
+                  <Link
+                    to={`/card-preview/${topCard.uuid}`}
+                    state={{ cardData: topCard, image: topCard.image }}
+                    className="btn-view-analytics"
+                  >
+                    <BsEye size={14} />
+                    <span>View Top Card</span>
+                  </Link>
+                </>
+              ) : (
+                <div className="py-3 text-center text-muted" style={{ fontSize: '0.85rem' }}>
+                  <p className="mb-2">No cards available yet.</p>
+                  <Link to="/card-details" className="btn btn-sm btn-outline-primary">
+                    Create a Card
+                  </Link>
+                </div>
+              )}
             </div>
-
-          ) : (
-            <h1 className="px-5"> Sorry no cards Available</h1>
-          )
-
-
-
-        }
-      </div>
-
-      <div className="temp-dash-container py-3">
-        <h2 className="p-4">Create New One</h2>
-
-        <div className="templates-dash-container py-2">
-          <div className="templates-box dash-blue" data-aos="fade-up">
-
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "blue" }}>Use Template</Link>
-            </div>
-
-            <div className="template-dash-name d-flex  align-items-center text-center p-3">
-              <span className="templates-dash-title">Premium Blue</span><br />
-
-
-            </div>
-
-
-          </div>
-          <div className="templates-box dash-white" data-aos="fade-up">
-
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "white" }}>Use Template</Link>
-            </div>
-
-
-            <div className=" template-dash-name d-flex  align-items-center text-center p-3">
-              <span className="templates-dash-title">Simple White</span><br />
-
-
-            </div>
-          </div>
-          <div className="templates-box dash-gold" data-aos="fade-up">
-
-
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "gold" }}>Use Template</Link>
-            </div>
-
-            <div className="template-dash-name d-flex  align-items-center text-center   p-3">
-              <span className="templates-dash-title">Luxury Gold</span><br />
-
-            </div>
-          </div>
-          <div className="templates-box dash-black" data-aos="fade-up">
-
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "black" }}>Use Template</Link>
-            </div>
-
-            <div className="template-dash-name d-flex  align-items-center text-center  p-3">
-              <span className="templates-dash-title">Stylish Black</span><br />
-
-            </div>
-
-
-
-          </div>
-          <div className="templates-box dash-purple" data-aos="fade-up">
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "purple" }}>Use Template</Link>
-            </div>
-
-            <div className="template-dash-name d-flex  align-items-center text-center   p-3">
-              <span className="templates-dash-title">Light Purple</span><br />
-
-            </div>
-
-
-
-          </div>
-          <div className="templates-box dash-green" data-aos="fade-up">
-
-            <div className="overlay">
-              <Link to="/card-details" className="preview-btn" state={{ theme: "green" }}>Use Template</Link>
-            </div>
-            <div className="template-dash-name d-flex align-items-center text-center   p-3">
-              <span className="templates-dash-title">Royal Green</span><br />
-
-            </div>
-
-
-
           </div>
         </div>
-      </div>
-
-
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
+
+
+

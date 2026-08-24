@@ -18,7 +18,7 @@ const Register = () => {
 
         try {
             const response = await axios.post(
-                "https://cardify-production-6e02.up.railway.app/sign-up",
+                "https://cardify-ge3r.onrender.com/sign-up",
                 {
                     username: values.uname,
                     password: values.pwd,

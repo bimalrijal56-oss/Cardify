@@ -12,7 +12,7 @@ const Login = () => {
   const handleSubmit = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
-        "https://cardify-production-6e02.up.railway.app/login",
+        "https://cardify-ge3r.onrender.com/login",
         {
           email: values.email,
           password: values.pwd,

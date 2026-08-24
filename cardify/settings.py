@@ -15,10 +15,10 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "*").split(",") if host.strip()]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.railway.app",
+    "https://cardify-ge3r.onrender.com",
     "https://cardify-plum.vercel.app",
 ]
 
@@ -38,13 +38,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
-    "corsheaders.middleware.CorsMiddleware",
-
-    "cardapp.middleware.MediaCORSMiddleware",
-
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
+    "corsheaders.middleware.CorsMiddleware",
+    "cardapp.middleware.MediaCORSMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -95,7 +91,10 @@ WSGI_APPLICATION = 'cardify.wsgi.application'
 
 if os.environ.get("DATABASE_URL"):
     DATABASES = {
-        "default": dj_database_url.config()
+        "default": dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
 else:
     DATABASES = {
