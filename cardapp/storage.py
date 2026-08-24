@@ -4,7 +4,7 @@ class SafeStaticFilesStorage(CompressedManifestStaticFilesStorage):
     manifest_strict = False
 
     def post_process(self, *args, **kwargs):
-        try:
-            yield from super().post_process(*args, **kwargs)
-        except Exception as e:
-            print(f"Warning: static post-processing skipped an error: {e}")
+        for name, hashed_name, processed in super().post_process(*args, **kwargs):
+            if isinstance(processed, Exception):
+                continue
+            yield name, hashed_name, processed
