@@ -482,21 +482,15 @@ const CardDetails = () => {
                     />
                   </div>
                   <div className="d-flex gap-2">
-                    {cardData.linkedin && (
-                      <span className="card-icons">
-                        <i className="bi bi-linkedin text-info fs-6"></i>
-                      </span>
-                    )}
-                    {cardData.twitter && (
-                      <span className="card-icons">
-                        <i className="bi bi-twitter text-info fs-6"></i>
-                      </span>
-                    )}
-                    {cardData.instagram && (
-                      <span className="card-icons">
-                        <i className="bi bi-instagram text-info fs-6"></i>
-                      </span>
-                    )}
+                    <span className="card-icons" title="LinkedIn">
+                      <i className="bi bi-linkedin text-info fs-6"></i>
+                    </span>
+                    <span className="card-icons" title="Twitter / X">
+                      <i className="bi bi-twitter text-info fs-6"></i>
+                    </span>
+                    <span className="card-icons" title="Instagram">
+                      <i className="bi bi-instagram text-info fs-6"></i>
+                    </span>
                   </div>
                 </div>
               </div>

@@ -7,7 +7,13 @@ import { API_BASE_URL } from '../config';
 
 const resolveImageSrc = (image) => {
   if (!image) return '';
-  if (typeof image === 'string' && image.startsWith('http')) return image;
+  if (typeof image === 'string' && (image.startsWith('data:') || image.startsWith('blob:'))) return image;
+  if (typeof image === 'string' && image.startsWith('http')) {
+    if (window.location.protocol === 'https:' && image.startsWith('http://')) {
+      return image.replace('http://', 'https://');
+    }
+    return image;
+  }
   if (typeof image === 'string') return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
   return '';
 };
@@ -99,21 +105,15 @@ const Card = () => {
               <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
             </div>
             <div className="d-flex card-social-icons gap-2">
-              {(cardData.linkedin_link || cardData.linkedin) && (
-                <a href={cardData.linkedin_link || cardData.linkedin} target="_blank" rel="noreferrer" className="card-icons">
-                  <div className="icon-box"><BsLinkedin /></div>
-                </a>
-              )}
-              {(cardData.twitter_link || cardData.twitter) && (
-                <a href={cardData.twitter_link || cardData.twitter} target="_blank" rel="noreferrer" className="card-icons">
-                  <div className="icon-box"><BsTwitterX /></div>
-                </a>
-              )}
-              {(cardData.insta_link || cardData.instagram) && (
-                <a href={cardData.insta_link || cardData.instagram} target="_blank" rel="noreferrer" className="card-icons">
-                  <div className="icon-box"><BsInstagram /></div>
-                </a>
-              )}
+              <a href={cardData?.linkedin_link || cardData?.linkedin || "#"} target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+                <div className="icon-box"><BsLinkedin /></div>
+              </a>
+              <a href={cardData?.twitter_link || cardData?.twitter || "#"} target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+                <div className="icon-box"><BsTwitterX /></div>
+              </a>
+              <a href={cardData?.insta_link || cardData?.instagram || "#"} target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+                <div className="icon-box"><BsInstagram /></div>
+              </a>
             </div>
           </div>
         </div>

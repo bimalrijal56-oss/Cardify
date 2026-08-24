@@ -25,12 +25,20 @@ const resolveImageSrc = (image) => {
         return URL.createObjectURL(image);
     }
 
-    if (typeof image === 'string' && image.startsWith('http')) {
-        return image;
-    }
-
     if (typeof image === 'string') {
-        return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+        if (image.startsWith('data:') || image.startsWith('blob:')) {
+            return image;
+        }
+
+        if (image.startsWith('http://') || image.startsWith('https://')) {
+            if (window.location.protocol === 'https:' && image.startsWith('http://')) {
+                return image.replace('http://', 'https://');
+            }
+            return image;
+        }
+
+        const cleanPath = image.startsWith('/') ? image : `/${image}`;
+        return `${API_BASE_URL}${cleanPath}`;
     }
 
     return '';
@@ -104,33 +112,32 @@ const CardPreview = () => {
 
         let cancelled = false;
 
-        const inlineImage = (imgSrc) => new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth || img.width;
-                canvas.height = img.naturalHeight || img.height;
-                const ctx = canvas.getContext('2d');
-
-                if (!ctx) {
-                    resolve(imgSrc);
-                    return;
+        const inlineImage = async (imgSrc) => {
+            try {
+                if (imgSrc.startsWith('data:') || imgSrc.startsWith('blob:')) {
+                    return imgSrc;
                 }
 
-                ctx.drawImage(img, 0, 0);
-                resolve(canvas.toDataURL('image/png'));
-            };
-            img.onerror = () => reject(new Error('Image failed to load'));
-            img.src = imgSrc;
-        });
+                const response = await fetch(imgSrc, { mode: 'cors' });
+                if (!response.ok) return imgSrc;
+                const blob = await response.blob();
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result || imgSrc);
+                    reader.onerror = () => resolve(imgSrc);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (err) {
+                console.warn('Image inlining skipped, using direct URL:', err);
+                return imgSrc;
+            }
+        };
 
         inlineImage(src)
             .then(dataUrl => {
-                if (!cancelled) setImageDataUrl(dataUrl);
+                if (!cancelled) setImageDataUrl(dataUrl || src);
             })
-            .catch(err => {
-                console.error('Failed to inline image:', err);
+            .catch(() => {
                 if (!cancelled) setImageDataUrl(src);
             });
 
@@ -255,71 +262,93 @@ const CardPreview = () => {
                     <div className="col-12 col-lg-7 d-flex justify-content-center">
                         <div className="card-item-white-box w-100 d-flex justify-content-center p-4">
                             <div className={`sample-preview-card p-4 border rounded-4 shadow ${cardData?.theme || 'blue'}`} ref={cardRef}>
-                                <hr className='card-stripe' />
-                                <div className="align-items-center card-logo shadow p-2 mb-3">
-                                    {image ? (
-                                        <div className="profile-image">
-                                            <img
-                                                src={imageDataUrl || resolveImageSrc(image)}
-                                                alt={cardData?.name}
-                                                crossOrigin="anonymous"
-                                            />
+                                <div className="card-top-content">
+                                    <hr className='card-stripe' />
+                                    <div className="align-items-center card-logo shadow p-2 mb-3">
+                                        {image ? (
+                                            <div className="profile-image">
+                                                <img
+                                                    src={imageDataUrl || resolveImageSrc(image)}
+                                                    alt={cardData?.name || 'Profile'}
+                                                    onError={(e) => {
+                                                        const directSrc = resolveImageSrc(image);
+                                                        if (e.target.src !== directSrc) {
+                                                            e.target.src = directSrc;
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <span className="fw-bold fs-5 text-dark p-2">
+                                                {cardData?.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className='fw-bold fs-5 text-white'>{cardData?.name}</span><br />
+                                    {cardData?.job && (
+                                        <>
+                                            <span className='text-info'>{cardData.job}</span><br />
+                                        </>
+                                    )}
+                                    {cardData?.company && (
+                                        <span className='text-white-50 small'>{cardData.company}</span>
+                                    )}
+                                    <hr />
+                                    {cardData?.tel && (
+                                        <div className="contact-row mb-1">
+                                            <BsTelephoneFill className="text-info me-2" />
+                                            <span className='text-white-50 small'>{cardData.tel}</span>
                                         </div>
-                                    ) : (
-                                        <span className="fw-bold fs-5 text-dark p-2">
-                                            {cardData?.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
-                                        </span>
+                                    )}
+                                    {cardData?.email && (
+                                        <div className="contact-row mb-1">
+                                            <BsEnvelopeFill className="text-info me-2" />
+                                            <span className='text-white-50 small'>{cardData.email}</span>
+                                        </div>
+                                    )}
+                                    {cardData?.address && (
+                                        <div className="contact-row mb-1">
+                                            <BsGlobe className="text-info me-2" />
+                                            <span className='text-white-50 small'>{cardData.address}</span>
+                                        </div>
                                     )}
                                 </div>
-                                <span className='fw-bold fs-5 text-white'>{cardData?.name}</span><br />
-                                {cardData?.job && (
-                                    <>
-                                        <span className='text-info'>{cardData.job}</span><br />
-                                    </>
-                                )}
-                                {cardData?.company && (
-                                    <span className='text-white-50 small'>{cardData.company}</span>
-                                )}
-                                <hr />
-                                {cardData?.tel && (
-                                    <div className="contact-row mb-1">
-                                        <BsTelephoneFill className="text-info me-2" />
-                                        <span className='text-white-50 small'>{cardData.tel}</span>
-                                    </div>
-                                )}
-                                {cardData?.email && (
-                                    <div className="contact-row mb-1">
-                                        <BsEnvelopeFill className="text-info me-2" />
-                                        <span className='text-white-50 small'>{cardData.email}</span>
-                                    </div>
-                                )}
-                                {cardData?.address && (
-                                    <div className="contact-row mb-1">
-                                        <BsGlobe className="text-info me-2" />
-                                        <span className='text-white-50 small'>{cardData.address}</span>
-                                    </div>
-                                )}
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <div className="bg-white p-1 rounded-2 shadow-sm">
-                                        <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
-                                    </div>
-                                    <div className="d-flex card-social-icons gap-2">
-                                        {(cardData?.linkedin_link || cardData?.linkedin) && (
-                                            <a href={cardData.linkedin_link || cardData.linkedin} target="_blank" rel="noreferrer" className="card-icons">
+
+                                <div className="card-bottom-content">
+                                    <hr />
+                                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div className="bg-white p-1 rounded-2 shadow-sm">
+                                            <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
+                                        </div>
+                                        <div className="d-flex card-social-icons gap-2">
+                                            <a
+                                                href={cardData?.linkedin_link || cardData?.linkedin || "#"}
+                                                target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined}
+                                                rel="noreferrer"
+                                                className="card-icons"
+                                                title="LinkedIn"
+                                            >
                                                 <div className="icon-box"><BsLinkedin /></div>
                                             </a>
-                                        )}
-                                        {(cardData?.twitter_link || cardData?.twitter) && (
-                                            <a href={cardData.twitter_link || cardData.twitter} target="_blank" rel="noreferrer" className="card-icons">
+                                            <a
+                                                href={cardData?.twitter_link || cardData?.twitter || "#"}
+                                                target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined}
+                                                rel="noreferrer"
+                                                className="card-icons"
+                                                title="Twitter / X"
+                                            >
                                                 <div className="icon-box"><BsTwitterX /></div>
                                             </a>
-                                        )}
-                                        {(cardData?.insta_link || cardData?.instagram) && (
-                                            <a href={cardData.insta_link || cardData.instagram} target="_blank" rel="noreferrer" className="card-icons">
+                                            <a
+                                                href={cardData?.insta_link || cardData?.instagram || "#"}
+                                                target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined}
+                                                rel="noreferrer"
+                                                className="card-icons"
+                                                title="Instagram"
+                                            >
                                                 <div className="icon-box"><BsInstagram /></div>
                                             </a>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
