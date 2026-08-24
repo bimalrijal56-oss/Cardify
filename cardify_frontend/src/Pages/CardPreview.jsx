@@ -312,15 +312,14 @@ const CardPreview = () => {
                                             <span className='text-white-50 small'>{cardData.address}</span>
                                         </div>
                                     )}
+                                    <hr className="my-3" />
                                 </div>
 
-                                <div className="card-bottom-content">
-                                    <hr />
-                                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                        <div className="bg-white p-1 rounded-2 shadow-sm">
-                                            <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
-                                        </div>
-                                        <div className="d-flex card-social-icons gap-2">
+                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-1">
+                                    <div className="bg-white p-1 rounded-2 shadow-sm">
+                                        <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
+                                    </div>
+                                    <div className="d-flex card-social-icons gap-2">
                                             <a
                                                 href={cardData?.linkedin_link || cardData?.linkedin || "#"}
                                                 target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined}

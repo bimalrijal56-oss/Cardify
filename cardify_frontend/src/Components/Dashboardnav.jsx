@@ -108,13 +108,15 @@ const Dashboardnav = () => {
             <span>Profile</span>
           </button>
 
-          <Link
-            to="/aboutus"
-            className={`dash-nav-item ${location.pathname === '/aboutus' ? 'active' : ''}`}
+          <a
+            href="https://www.instagram.com/bimalrijal_17/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dash-nav-item"
           >
             <FaHeadset />
             <span>Support</span>
-          </Link>
+          </a>
         </nav>
       </div>
 

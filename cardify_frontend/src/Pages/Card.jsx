@@ -26,16 +26,24 @@ const Card = () => {
   const cardlink = `${window.location.origin}/card/${uuid}`;
 
   useEffect(() => {
+    if (!uuid) return;
     setLoading(true);
-    axios.get(`${API_BASE_URL}/api/cards/?format=json`)
+    axios.get(`${API_BASE_URL}/api/cards/${uuid}/`)
       .then(res => {
-        const allCards = Array.isArray(res.data) ? res.data : [];
-        const found = allCards.find(c => c.uuid === uuid);
-        if (found) {
-          setCardData(found);
+        if (res.data) {
+          setCardData(res.data);
         }
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error('Error fetching card by uuid:', err);
+        axios.get(`${API_BASE_URL}/api/cards/?format=json`)
+          .then(listRes => {
+            const allCards = Array.isArray(listRes.data) ? listRes.data : [];
+            const found = allCards.find(c => c.uuid === uuid);
+            if (found) setCardData(found);
+          })
+          .catch(e => console.error(e));
+      })
       .finally(() => setLoading(false));
   }, [uuid]);
 
@@ -93,14 +101,14 @@ const Card = () => {
               <span className="text-white-50 small">{cardData.email}</span>
             </div>
           )}
-          {cardData.address && (
+          {cardData?.address && (
             <div className="contact-row mb-1">
               <BsGlobe className="text-info me-2" />
               <span className="text-white-50 small">{cardData.address}</span>
             </div>
           )}
-          <hr />
-          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <hr className="my-3" />
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-1">
             <div className="bg-white p-1 rounded-2 shadow-sm">
               <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
             </div>

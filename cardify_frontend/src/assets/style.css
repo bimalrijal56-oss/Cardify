@@ -1596,7 +1596,7 @@ ul {
 .sample-preview-card {
   width: 100%;
   max-width: 360px;
-  min-height: 520px;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

@@ -76,7 +76,7 @@ const Dashboard = () => {
   }, [user_id]);
 
   // Filter cards strictly for current user
-  const userCards = cards.filter((item) => user_id === item.user);
+  const userCards = cards.filter((item) => Number(item.user) === user_id || item.user?.id === user_id);
   const cardsCount = userCards.length;
 
   // Compute real views from user's cards
