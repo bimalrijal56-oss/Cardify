@@ -3266,24 +3266,29 @@ ul {
     font-size: 1.2rem;
   }
   .dash-sidebar-nav {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 0.45rem;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
   }
   .dash-sidebar-nav::-webkit-scrollbar {
     display: none;
   }
   .dash-nav-item {
-    width: auto;
+    width: 100% !important;
     white-space: nowrap;
-    padding: 0.48rem 0.85rem;
-    font-size: 0.86rem;
-    flex-shrink: 0;
-    border-radius: 9px;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+  .dash-nav-item:last-child:nth-child(odd) {
+    grid-column: span 2 !important;
   }
   .dash-nav-item:hover {
     transform: none;
