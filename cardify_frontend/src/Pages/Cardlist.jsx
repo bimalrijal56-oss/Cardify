@@ -121,16 +121,14 @@ const Cardlist = () => {
                   <div>
                     <div className={`sample-preview-card p-4 border rounded-4 shadow-sm ${item.theme || 'blue'}`}>
                       <hr className='card-stripe' />
-                      <div className="align-items-center card-logo shadow p-2 mb-3">
+                      <div className="card-avatar-wrapper">
                         {item.image ? (
-                          <div className="profile-image">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                            />
-                          </div>
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                          />
                         ) : (
-                          <span className='fw-bold fs-5 text-dark p-2 card-text-wrap'>{item.name || 'Card'}</span>
+                          <span className='card-avatar-initial'>{item.name ? item.name.charAt(0).toUpperCase() : 'C'}</span>
                         )}
                       </div>
                       <span className='fw-bold fs-5 card-text-wrap text-white'>{item.name}</span><br />
@@ -138,20 +136,20 @@ const Cardlist = () => {
                       <span className='text-secondary card-text-wrap text-white-50'>{item.company}</span>
                       <hr />
                       {item.tel && (
-                        <div className="contact-row mb-1">
-                          <i className="bi bi-telephone-fill text-info me-2"></i>
+                        <div className="contact-row">
+                          <i className="bi bi-telephone-fill text-info"></i>
                           <span className='text-white-50 card-text-wrap'>{item.tel}</span>
                         </div>
                       )}
                       {item.email && (
-                        <div className="contact-row mb-1">
-                          <i className="bi bi-envelope-fill text-info me-2"></i>
+                        <div className="contact-row">
+                          <i className="bi bi-envelope-fill text-info"></i>
                           <span className='text-white-50 card-text-wrap'>{item.email}</span>
                         </div>
                       )}
                       {item.address && (
-                        <div className="contact-row mb-1">
-                          <i className="bi bi-globe text-info me-2"></i>
+                        <div className="contact-row">
+                          <i className="bi bi-globe text-info"></i>
                           <span className='text-white-50 card-text-wrap'>{item.address}</span>
                         </div>
                       )}
@@ -160,17 +158,22 @@ const Cardlist = () => {
                         <QRCode value={cardlink(item.uuid)} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
                         <div className="d-flex gap-2">
                           {item.linkedin_link && (
-                            <a href={item.linkedin_link} target="_blank" rel="noreferrer" className="card-icons">
+                            <a href={item.linkedin_link} target="_blank" rel="noreferrer" className="card-icons" title="LinkedIn">
                               <i className="bi bi-linkedin text-info fs-6"></i>
                             </a>
                           )}
                           {item.twitter_link && (
-                            <a href={item.twitter_link} target="_blank" rel="noreferrer" className="card-icons">
+                            <a href={item.twitter_link} target="_blank" rel="noreferrer" className="card-icons" title="Twitter / X">
                               <i className="bi bi-twitter text-info fs-6"></i>
                             </a>
                           )}
+                          {(item.fb_link || item.facebook) && (
+                            <a href={item.fb_link || item.facebook} target="_blank" rel="noreferrer" className="card-icons" title="Facebook">
+                              <i className="bi bi-facebook text-info fs-6"></i>
+                            </a>
+                          )}
                           {item.insta_link && (
-                            <a href={item.insta_link} target="_blank" rel="noreferrer" className="card-icons">
+                            <a href={item.insta_link} target="_blank" rel="noreferrer" className="card-icons" title="Instagram">
                               <i className="bi bi-instagram text-info fs-6"></i>
                             </a>
                           )}

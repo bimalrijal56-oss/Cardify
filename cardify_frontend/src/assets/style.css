@@ -1540,21 +1540,29 @@ ul {
 }
 
 .contact-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 1px;
-  margin-bottom: 8px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 8px !important;
 }
 
-.contact-row i {
-  flex-shrink: 0;
-  margin-top: 5px;
+.contact-row i,
+.contact-row svg {
+  flex-shrink: 0 !important;
+  font-size: 0.95rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin: 0 !important;
 }
 
 .contact-row span {
   max-width: 250px;
   overflow-wrap: break-word;
   word-break: break-word;
+  line-height: 1.3 !important;
+  font-family: 'Inter', 'Poppins', -apple-system, sans-serif !important;
 }
 
 .search-box:hover {
@@ -2400,9 +2408,14 @@ ul {
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
+  height: 100vh;
+  max-width: 100vw;
+  width: 100%;
+  overflow: hidden;
   background-color: #f1f5f9;
   font-family: 'Inter', 'Poppins', sans-serif !important;
   color: #0f172a;
+  box-sizing: border-box;
 }
 
 .dashboard-layout *,
@@ -2432,8 +2445,11 @@ ul {
   z-index: 100;
   transition: transform 0.3s ease;
   height: 100vh;
+  min-height: 100vh;
   position: sticky;
   top: 0;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .dash-sidebar-top {
@@ -2569,7 +2585,7 @@ ul {
   font-weight: 700;
   font-size: 0.85rem;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+  box-shadow: none;
 }
 
 .dash-sidebar-user-info {
@@ -2601,7 +2617,7 @@ ul {
   height: 6px;
   background-color: #10b981;
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+  box-shadow: none;
 }
 
 .dash-sidebar-logout {
@@ -3210,12 +3226,19 @@ ul {
 
 @media (max-width: 900px) {
   .dashboard-layout {
-    flex-direction: column;
+    flex-direction: column !important;
     min-height: 100vh;
+    height: auto !important;
+    overflow: visible !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
   }
   .dash-sidebar {
-    width: 100%;
-    min-width: 100%;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100vw !important;
     min-height: auto !important;
     height: auto !important;
     position: relative !important;
@@ -3225,6 +3248,8 @@ ul {
     padding: 0.85rem 1rem;
     gap: 0.75rem;
     justify-content: flex-start !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
   }
   .dash-sidebar-top {
     gap: 0.4rem;
@@ -3295,6 +3320,13 @@ ul {
   }
   .dash-main {
     padding: 1.25rem 1rem;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -3302,14 +3334,72 @@ ul {
   .dash-topbar {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.85rem;
   }
   .dash-topbar-actions {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   .dash-metrics-grid {
     grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
+}
+
+@media (max-width: 576px) {
+  .recent-card-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .recent-card-info {
+    min-width: 140px;
+  }
+  .recent-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e2e8f0;
+  }
+  .builder-form-card {
+    padding: 1.25rem 0.95rem;
+  }
+  .card-item-white-box {
+    padding: 1rem;
+  }
+}
+
+/* ── Standardized Card Avatar Container ── */
+.card-avatar-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.card-avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-avatar-wrapper .card-avatar-initial {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  line-height: 1;
+  font-family: 'Inter', 'Poppins', sans-serif !important;
 }
 
 /* ── White Theme Dashboard Nav ── */

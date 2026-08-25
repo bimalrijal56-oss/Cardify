@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import QRCode from "react-qr-code";
-import { BsLinkedin, BsTwitterX, BsInstagram, BsTelephoneFill, BsEnvelopeFill, BsGlobe } from "react-icons/bs";
+import { BsLinkedin, BsTwitterX, BsFacebook, BsInstagram, BsTelephoneFill, BsEnvelopeFill, BsGlobe } from "react-icons/bs";
 import { API_BASE_URL } from '../config';
 
 const resolveImageSrc = (image) => {
@@ -14,7 +14,17 @@ const resolveImageSrc = (image) => {
     }
     return image;
   }
-  if (typeof image === 'string') return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+  if (typeof image === 'string') {
+    if (image.startsWith('/media/') || image.startsWith('media/')) {
+      const cleanPath = image.startsWith('/') ? image : `/${image}`;
+      return `${API_BASE_URL}${cleanPath}`;
+    }
+    if (image.startsWith('/Cards/') || image.startsWith('Cards/')) {
+      const cleanPath = image.startsWith('/') ? image : `/${image}`;
+      return `${API_BASE_URL}/media${cleanPath}`;
+    }
+    return `${API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+  }
   return '';
 };
 
@@ -69,17 +79,15 @@ const Card = () => {
       <div className="w-100" style={{ maxWidth: '420px' }}>
         <div className={`sample-preview-card p-4 border rounded-4 shadow ${cardData.theme || 'blue'}`}>
           <hr className="card-stripe" />
-          <div className="align-items-center card-logo shadow p-2 mb-3">
+          <div className="card-avatar-wrapper">
             {cardData.image ? (
-              <div className="profile-image">
-                <img
-                  src={resolveImageSrc(cardData.image)}
-                  alt={cardData.name}
-                  crossOrigin="anonymous"
-                />
-              </div>
+              <img
+                src={resolveImageSrc(cardData.image)}
+                alt={cardData.name}
+                crossOrigin="anonymous"
+              />
             ) : (
-              <span className="fw-bold fs-5 text-dark p-2 card-text-wrap">
+              <span className="card-avatar-initial">
                 {cardData.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
               </span>
             )}
@@ -90,20 +98,20 @@ const Card = () => {
           {cardData.company && <span className="text-white-50 small">{cardData.company}</span>}
           <hr />
           {cardData.tel && (
-            <div className="contact-row mb-1">
-              <BsTelephoneFill className="text-info me-2" />
+            <div className="contact-row">
+              <BsTelephoneFill className="text-info" />
               <span className="text-white-50 small">{cardData.tel}</span>
             </div>
           )}
           {cardData.email && (
-            <div className="contact-row mb-1">
-              <BsEnvelopeFill className="text-info me-2" />
+            <div className="contact-row">
+              <BsEnvelopeFill className="text-info" />
               <span className="text-white-50 small">{cardData.email}</span>
             </div>
           )}
           {cardData?.address && (
-            <div className="contact-row mb-1">
-              <BsGlobe className="text-info me-2" />
+            <div className="contact-row">
+              <BsGlobe className="text-info" />
               <span className="text-white-50 small">{cardData.address}</span>
             </div>
           )}
@@ -113,13 +121,16 @@ const Card = () => {
               <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
             </div>
             <div className="d-flex card-social-icons gap-2">
-              <a href={cardData?.linkedin_link || cardData?.linkedin || "#"} target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+              <a href={cardData?.linkedin_link || cardData?.linkedin || "#"} target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined} rel="noreferrer" className="card-icons" title="LinkedIn">
                 <div className="icon-box"><BsLinkedin /></div>
               </a>
-              <a href={cardData?.twitter_link || cardData?.twitter || "#"} target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+              <a href={cardData?.twitter_link || cardData?.twitter || "#"} target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined} rel="noreferrer" className="card-icons" title="Twitter / X">
                 <div className="icon-box"><BsTwitterX /></div>
               </a>
-              <a href={cardData?.insta_link || cardData?.instagram || "#"} target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined} rel="noreferrer" className="card-icons">
+              <a href={cardData?.fb_link || cardData?.facebook || "#"} target={cardData?.fb_link || cardData?.facebook ? "_blank" : undefined} rel="noreferrer" className="card-icons" title="Facebook">
+                <div className="icon-box"><BsFacebook /></div>
+              </a>
+              <a href={cardData?.insta_link || cardData?.instagram || "#"} target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined} rel="noreferrer" className="card-icons" title="Instagram">
                 <div className="icon-box"><BsInstagram /></div>
               </a>
             </div>

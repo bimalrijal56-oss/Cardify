@@ -450,15 +450,14 @@ const CardDetails = () => {
               {/* Render Preview Card */}
               <div className={`sample-detail-card p-4 border rounded-4 shadow-sm ${cardData.theme || 'blue'}`}>
                 <hr className="card-stripe" />
-                <div className="align-items-center card-logo shadow p-2 mb-3">
+                <div className="card-avatar-wrapper">
                   {imagePreview ? (
                     <img
                       src={imagePreview}
                       alt="Preview Avatar"
-                      style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
                     />
                   ) : (
-                    <span className="fw-bold fs-5 text-dark p-2">
+                    <span className="card-avatar-initial">
                       {cardData.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
                     </span>
                   )}
@@ -480,20 +479,20 @@ const CardDetails = () => {
                 {(cardData.tel || cardData.email || cardData.address) && <hr />}
 
                 {cardData.tel && (
-                  <div className="contact-row mb-1">
-                    <i className="bi bi-telephone-fill text-info me-2"></i>
+                  <div className="contact-row">
+                    <i className="bi bi-telephone-fill text-info"></i>
                     <span className="text-white-50 small">{cardData.tel}</span>
                   </div>
                 )}
                 {cardData.email && (
-                  <div className="contact-row mb-1">
-                    <i className="bi bi-envelope-fill text-info me-2"></i>
+                  <div className="contact-row">
+                    <i className="bi bi-envelope-fill text-info"></i>
                     <span className="text-white-50 small">{cardData.email}</span>
                   </div>
                 )}
                 {cardData.address && (
-                  <div className="contact-row mb-1">
-                    <i className="bi bi-globe text-info me-2"></i>
+                  <div className="contact-row">
+                    <i className="bi bi-globe text-info"></i>
                     <span className="text-white-50 small">{cardData.address}</span>
                   </div>
                 )}
@@ -514,6 +513,9 @@ const CardDetails = () => {
                     </span>
                     <span className="card-icons" title="Twitter / X">
                       <i className="bi bi-twitter text-info fs-6"></i>
+                    </span>
+                    <span className="card-icons" title="Facebook">
+                      <i className="bi bi-facebook text-info fs-6"></i>
                     </span>
                     <span className="card-icons" title="Instagram">
                       <i className="bi bi-instagram text-info fs-6"></i>

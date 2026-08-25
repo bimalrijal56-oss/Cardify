@@ -5,9 +5,8 @@ import { useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { useRef } from "react";
 import {
-    BsLinkedin, BsTwitterX, BsInstagram,
+    BsLinkedin, BsTwitterX, BsFacebook, BsInstagram,
     BsTelephoneFill, BsEnvelopeFill, BsGlobe,
-
 } from "react-icons/bs";
 import axios from 'axios';
 import html2canvas from 'html2canvas';
@@ -35,6 +34,16 @@ const resolveImageSrc = (image) => {
                 return image.replace('http://', 'https://');
             }
             return image;
+        }
+
+        if (image.startsWith('/media/') || image.startsWith('media/')) {
+            const cleanPath = image.startsWith('/') ? image : `/${image}`;
+            return `${API_BASE_URL}${cleanPath}`;
+        }
+
+        if (image.startsWith('/Cards/') || image.startsWith('Cards/')) {
+            const cleanPath = image.startsWith('/') ? image : `/${image}`;
+            return `${API_BASE_URL}/media${cleanPath}`;
         }
 
         const cleanPath = image.startsWith('/') ? image : `/${image}`;
@@ -98,9 +107,6 @@ const CardPreview = () => {
             .finally(() => setLoading(false));
     }, [uuid, user_id, location.state]);
 
-
-
-
     const [imageDataUrl, setImageDataUrl] = useState('');
 
     useEffect(() => {
@@ -110,74 +116,90 @@ const CardPreview = () => {
             return;
         }
 
+        if (src.startsWith('data:')) {
+            setImageDataUrl(src);
+            return;
+        }
+
         let cancelled = false;
 
-        const inlineImage = async (imgSrc) => {
+        const convertToDataURL = async (url) => {
             try {
-                if (imgSrc.startsWith('data:') || imgSrc.startsWith('blob:')) {
-                    return imgSrc;
+                const response = await fetch(url, { mode: 'cors' });
+                if (response.ok) {
+                    const blob = await response.blob();
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result || url);
+                        reader.onerror = () => resolve(url);
+                        reader.readAsDataURL(blob);
+                    });
                 }
-
-                const response = await fetch(imgSrc, { mode: 'cors' });
-                if (!response.ok) return imgSrc;
-                const blob = await response.blob();
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result || imgSrc);
-                    reader.onerror = () => resolve(imgSrc);
-                    reader.readAsDataURL(blob);
-                });
             } catch (err) {
-                console.warn('Image inlining skipped, using direct URL:', err);
-                return imgSrc;
+                // Fallback to Image canvas draw
             }
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || img.width || 300;
+                        canvas.height = img.naturalHeight || img.height || 300;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (e) {
+                        resolve(url);
+                    }
+                };
+                img.onerror = () => resolve(url);
+                img.src = url;
+            });
         };
 
-        inlineImage(src)
-            .then(dataUrl => {
-                if (!cancelled) setImageDataUrl(dataUrl || src);
-            })
-            .catch(() => {
-                if (!cancelled) setImageDataUrl(src);
-            });
+        convertToDataURL(src).then((dataUrl) => {
+            if (!cancelled && dataUrl) {
+                setImageDataUrl(dataUrl);
+            }
+        });
 
         return () => {
             cancelled = true;
         };
     }, [image]);
 
-    const waitForCardRender = async () => {
-        if (!cardRef.current) return;
-
-        const cardImage = cardRef.current.querySelector('img');
-        if (!cardImage) return;
-
-        if (cardImage.complete) return;
-
-        await new Promise((resolve, reject) => {
-            cardImage.onload = resolve;
-            cardImage.onerror = reject;
-        });
-    };
-
     const downloadCard = async () => {
         if (!cardRef.current) return;
 
         try {
             await document.fonts.ready;
-            await waitForCardRender();
+
+            // Wait for all images inside cardRef to be fully rendered
+            const imgElements = cardRef.current.querySelectorAll('img');
+            await Promise.all(
+                Array.from(imgElements).map((img) => {
+                    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+                    return new Promise((resolve) => {
+                        img.onload = resolve;
+                        img.onerror = resolve;
+                    });
+                })
+            );
 
             const canvas = await html2canvas(cardRef.current, {
                 backgroundColor: null,
-                scale: window.devicePixelRatio || 2,
+                scale: Math.max(window.devicePixelRatio || 2, 2),
                 useCORS: true,
-                allowTaint: false,
+                allowTaint: true,
                 logging: false,
             });
 
             const link = document.createElement('a');
             link.href = canvas.toDataURL('image/png');
-            link.download = 'BusinessCard.png';
+            const cardName = (cardData?.name || 'BusinessCard').replace(/[^a-zA-Z0-9_-]/g, '_');
+            link.download = `${cardName}_Card.png`;
             link.click();
         } catch (err) {
             console.error('Download failed:', err);
@@ -193,9 +215,9 @@ const CardPreview = () => {
         try {
             const canvas = await html2canvas(qrRef.current, {
                 backgroundColor: null,
-                scale: window.devicePixelRatio || 2,
+                scale: Math.max(window.devicePixelRatio || 2, 2),
                 useCORS: true,
-                allowTaint: false,
+                allowTaint: true,
                 logging: false,
             });
             const link = document.createElement('a');
@@ -264,22 +286,21 @@ const CardPreview = () => {
                             <div className={`sample-preview-card p-4 border rounded-4 shadow ${cardData?.theme || 'blue'}`} ref={cardRef}>
                                 <div className="card-top-content">
                                     <hr className='card-stripe' />
-                                    <div className="align-items-center card-logo shadow p-2 mb-3">
+                                    <div className="card-avatar-wrapper">
                                         {image ? (
-                                            <div className="profile-image">
-                                                <img
-                                                    src={imageDataUrl || resolveImageSrc(image)}
-                                                    alt={cardData?.name || 'Profile'}
-                                                    onError={(e) => {
-                                                        const directSrc = resolveImageSrc(image);
-                                                        if (e.target.src !== directSrc) {
-                                                            e.target.src = directSrc;
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
+                                            <img
+                                                src={imageDataUrl || resolveImageSrc(image)}
+                                                alt={cardData?.name || 'Profile'}
+                                                crossOrigin="anonymous"
+                                                onError={(e) => {
+                                                    const directSrc = resolveImageSrc(image);
+                                                    if (e.target.src !== directSrc) {
+                                                        e.target.src = directSrc;
+                                                    }
+                                                }}
+                                            />
                                         ) : (
-                                            <span className="fw-bold fs-5 text-dark p-2">
+                                            <span className="card-avatar-initial">
                                                 {cardData?.name ? cardData.name.charAt(0).toUpperCase() : 'C'}
                                             </span>
                                         )}
@@ -295,20 +316,20 @@ const CardPreview = () => {
                                     )}
                                     <hr />
                                     {cardData?.tel && (
-                                        <div className="contact-row mb-1">
-                                            <BsTelephoneFill className="text-info me-2" />
+                                        <div className="contact-row">
+                                            <BsTelephoneFill className="text-info" />
                                             <span className='text-white-50 small'>{cardData.tel}</span>
                                         </div>
                                     )}
                                     {cardData?.email && (
-                                        <div className="contact-row mb-1">
-                                            <BsEnvelopeFill className="text-info me-2" />
+                                        <div className="contact-row">
+                                            <BsEnvelopeFill className="text-info" />
                                             <span className='text-white-50 small'>{cardData.email}</span>
                                         </div>
                                     )}
                                     {cardData?.address && (
-                                        <div className="contact-row mb-1">
-                                            <BsGlobe className="text-info me-2" />
+                                        <div className="contact-row">
+                                            <BsGlobe className="text-info" />
                                             <span className='text-white-50 small'>{cardData.address}</span>
                                         </div>
                                     )}
@@ -320,38 +341,47 @@ const CardPreview = () => {
                                         <QRCode value={cardlink} size={256} style={{ height: "45px", maxWidth: "45px", width: "45px" }} />
                                     </div>
                                     <div className="d-flex card-social-icons gap-2">
-                                            <a
-                                                href={cardData?.linkedin_link || cardData?.linkedin || "#"}
-                                                target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined}
-                                                rel="noreferrer"
-                                                className="card-icons"
-                                                title="LinkedIn"
-                                            >
-                                                <div className="icon-box"><BsLinkedin /></div>
-                                            </a>
-                                            <a
-                                                href={cardData?.twitter_link || cardData?.twitter || "#"}
-                                                target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined}
-                                                rel="noreferrer"
-                                                className="card-icons"
-                                                title="Twitter / X"
-                                            >
-                                                <div className="icon-box"><BsTwitterX /></div>
-                                            </a>
-                                            <a
-                                                href={cardData?.insta_link || cardData?.instagram || "#"}
-                                                target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined}
-                                                rel="noreferrer"
-                                                className="card-icons"
-                                                title="Instagram"
-                                            >
-                                                <div className="icon-box"><BsInstagram /></div>
-                                            </a>
-                                        </div>
+                                        <a
+                                            href={cardData?.linkedin_link || cardData?.linkedin || "#"}
+                                            target={cardData?.linkedin_link || cardData?.linkedin ? "_blank" : undefined}
+                                            rel="noreferrer"
+                                            className="card-icons"
+                                            title="LinkedIn"
+                                        >
+                                            <div className="icon-box"><BsLinkedin /></div>
+                                        </a>
+                                        <a
+                                            href={cardData?.twitter_link || cardData?.twitter || "#"}
+                                            target={cardData?.twitter_link || cardData?.twitter ? "_blank" : undefined}
+                                            rel="noreferrer"
+                                            className="card-icons"
+                                            title="Twitter / X"
+                                        >
+                                            <div className="icon-box"><BsTwitterX /></div>
+                                        </a>
+                                        <a
+                                            href={cardData?.fb_link || cardData?.facebook || "#"}
+                                            target={cardData?.fb_link || cardData?.facebook ? "_blank" : undefined}
+                                            rel="noreferrer"
+                                            className="card-icons"
+                                            title="Facebook"
+                                        >
+                                            <div className="icon-box"><BsFacebook /></div>
+                                        </a>
+                                        <a
+                                            href={cardData?.insta_link || cardData?.instagram || "#"}
+                                            target={cardData?.insta_link || cardData?.instagram ? "_blank" : undefined}
+                                            rel="noreferrer"
+                                            className="card-icons"
+                                            title="Instagram"
+                                        >
+                                            <div className="icon-box"><BsInstagram /></div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                     {/* Right: Actions */}
                     <div className="col-12 col-lg-5">
