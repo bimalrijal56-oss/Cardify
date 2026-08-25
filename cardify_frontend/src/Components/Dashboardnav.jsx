@@ -4,12 +4,8 @@ import {
   FaHome,
   FaCreditCard,
   FaChartBar,
-  FaUsers,
   FaThLarge,
-  FaCog,
-  FaUser,
   FaHeadset,
-  FaCrown,
   FaSignOutAlt,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -36,15 +32,14 @@ const Dashboardnav = () => {
 
   return (
     <aside className="dash-sidebar">
-      <div>
-        {/* Brand */}
+      <div className="dash-sidebar-top">
+        {/* Brand with logo matching home navbar */}
         <Link to="/" className="dash-sidebar-brand">
-          <div className="dash-brand-icon">
-            <FaCreditCard />
+          <img src="/CARDIFY1.png" alt="CARDIFY Logo" className="dash-sidebar-logo-img" />
+          <div className="dash-sidebar-brand-text">
+            <span className="dash-brand-text-white">CARD</span>
+            <span className="dash-brand-text-blue">IFY</span>
           </div>
-          <h3 className="dash-brand-title">
-            CARD<span>IFY</span>
-          </h3>
         </Link>
 
         {/* Sidebar Nav Items */}
@@ -53,7 +48,7 @@ const Dashboardnav = () => {
             to="/dashboard"
             className={`dash-nav-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
           >
-            <FaHome />
+            <FaHome className="dash-nav-icon" />
             <span>Dashboard</span>
           </Link>
 
@@ -61,7 +56,7 @@ const Dashboardnav = () => {
             to="/cardlist"
             className={`dash-nav-item ${location.pathname === '/cardlist' ? 'active' : ''}`}
           >
-            <FaCreditCard />
+            <FaCreditCard className="dash-nav-icon" />
             <span>My Cards</span>
           </Link>
 
@@ -69,44 +64,17 @@ const Dashboardnav = () => {
             to="/dashboard"
             className={`dash-nav-item ${location.pathname === '/analytics' ? 'active' : ''}`}
           >
-            <FaChartBar />
+            <FaChartBar className="dash-nav-icon" />
             <span>Analytics</span>
           </Link>
-
-          <button
-            type="button"
-            className={`dash-nav-item ${location.pathname === '/contacts' ? 'active' : ''}`}
-            onClick={() => toast.info('Contacts feature connected to your cards')}
-          >
-            <FaUsers />
-            <span>Contacts</span>
-          </button>
 
           <Link
             to="/card-details"
             className={`dash-nav-item ${location.pathname === '/card-details' ? 'active' : ''}`}
           >
-            <FaThLarge />
+            <FaThLarge className="dash-nav-icon" />
             <span>Templates</span>
           </Link>
-
-          <button
-            type="button"
-            className={`dash-nav-item ${location.pathname === '/settings' ? 'active' : ''}`}
-            onClick={() => toast.info('Settings panel')}
-          >
-            <FaCog />
-            <span>Settings</span>
-          </button>
-
-          <button
-            type="button"
-            className={`dash-nav-item ${location.pathname === '/profile' ? 'active' : ''}`}
-            onClick={() => toast.info(`Logged in as: ${username || 'User'}`)}
-          >
-            <FaUser />
-            <span>Profile</span>
-          </button>
 
           <a
             href="https://www.instagram.com/bimalrijal_17/"
@@ -114,34 +82,30 @@ const Dashboardnav = () => {
             rel="noopener noreferrer"
             className="dash-nav-item"
           >
-            <FaHeadset />
+            <FaHeadset className="dash-nav-icon" />
             <span>Support</span>
           </a>
         </nav>
       </div>
 
-      <div>
-        {/* Go Premium Box */}
-        <div className="dash-premium-card">
-          <div className="dash-premium-icon">
-            <FaCrown />
+      <div className="dash-sidebar-bottom">
+        {/* User Mini Profile */}
+        <div className="dash-sidebar-user">
+          <div className="dash-sidebar-avatar">
+            {username ? username.charAt(0).toUpperCase() : 'U'}
           </div>
-          <h5 className="dash-premium-title">Go Premium</h5>
-          <p className="dash-premium-desc">
-            Unlock premium templates, custom domains and more.
-          </p>
-          <Link
-            to="/card-details"
-            className="dash-upgrade-btn"
-            state={{ theme: 'gold' }}
-          >
-            Upgrade Now
-          </Link>
+          <div className="dash-sidebar-user-info">
+            <div className="dash-sidebar-username">{username || 'User'}</div>
+            <div className="dash-sidebar-status">
+              <span className="dash-status-dot"></span>
+              Active
+            </div>
+          </div>
         </div>
 
         {/* Logout Button */}
         <button type="button" className="dash-sidebar-logout" onClick={handleLogout}>
-          <FaSignOutAlt />
+          <FaSignOutAlt className="dash-logout-icon" />
           <span>Logout</span>
         </button>
       </div>
@@ -150,5 +114,3 @@ const Dashboardnav = () => {
 };
 
 export default Dashboardnav;
-
-

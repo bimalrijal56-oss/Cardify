@@ -18,20 +18,7 @@ import {
   BsBarChartFill,
   BsPlusCircleDotted,
 } from 'react-icons/bs';
-import {
-  FaHome,
-  FaCreditCard,
-  FaChartBar,
-  FaUsers,
-  FaThLarge,
-  FaCog,
-  FaUser,
-  FaHeadset,
-  FaCrown,
-  FaSignOutAlt,
-  FaBell,
-  FaShareAlt,
-} from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -41,7 +28,6 @@ const Dashboard = () => {
 
   const [cards, setCards] = useState([]);
   const [totalClicks, setTotalClicks] = useState(0);
-  const [activeNav, setActiveNav] = useState('dashboard');
   const [timeFilter, setTimeFilter] = useState('All Time');
   const [loading, setLoading] = useState(true);
 
@@ -156,7 +142,7 @@ const Dashboard = () => {
       {/* Topbar */}
       <header className="dash-topbar">
         <div>
-          <h1 className="dash-welcome-title">Welcome back, {displayName}! 👋</h1>
+          <h1 className="dash-welcome-title">Welcome back, {displayName}!</h1>
           <p className="dash-welcome-sub">
             Here's what's happening with your cards today.
           </p>

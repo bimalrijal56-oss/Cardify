@@ -105,20 +105,53 @@ ul {
   z-index: 1000;
   position: sticky !important;
   top: 0;
-  padding: 3px 0 !important;
-
+  padding: 6px 0 !important;
 }
 
-.nav-links:hover {
-  color: var(--accent) !important;
+.navbar .nav-links {
+  position: relative;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.05rem;
+  padding: 4px 0 !important;
+  color: #e0f2fe !important;
+  transition: color 0.25s ease;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.navbar nav .active::after {
+.navbar .nav-links::after {
   content: '';
   display: block;
-  width: 45px;
-  height: 2px;
-  background: var(--text) !important;
+  width: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #00B4D8, #48CAE4) !important;
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 4px;
+}
+
+.navbar .nav-links:hover {
+  color: #00B4D8 !important;
+}
+
+.navbar .nav-links:hover::after {
+  width: 100%;
+}
+
+.navbar .nav-links.active {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.navbar .nav-links.active::after {
+  content: '';
+  display: block;
+  width: 100% !important;
+  height: 2.5px;
+  background: linear-gradient(90deg, #00B4D8, #48CAE4) !important;
+  box-shadow: 0 2px 8px rgba(0, 180, 216, 0.5);
 }
 
 .dash-sidebar-nav .active::after,
@@ -2388,161 +2421,185 @@ ul {
 
 /* ── Sidebar ── */
 .dash-sidebar {
-  width: 250px;
-  min-width: 250px;
-  background-color: #09101d;
+  width: 260px;
+  min-width: 260px;
+  background: linear-gradient(180deg, #060d19 0%, #091322 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.5rem 1rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1.5rem 1.15rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
   z-index: 100;
   transition: transform 0.3s ease;
+  min-height: 100vh;
+}
+
+.dash-sidebar-top {
+  display: flex;
+  flex-direction: column;
 }
 
 .dash-sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 0.5rem 1.5rem 0.5rem;
+  gap: 12px;
+  padding: 0.25rem 0.5rem 1.5rem 0.5rem;
   text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 1rem;
 }
 
-.dash-brand-icon {
+.dash-sidebar-logo-img {
   width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 1.25rem;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 180, 216, 0.35));
 }
 
-.dash-brand-title {
-  font-size: 1.25rem;
+.dash-sidebar-brand-text {
+  font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: #ffffff !important;
-  margin: 0;
+  line-height: 1;
 }
 
-.dash-brand-title span {
-  color: #38bdf8 !important;
+.dash-brand-text-white {
+  color: #ffffff !important;
+  font-family: 'Inter', 'Poppins', sans-serif !important;
+}
+
+.dash-brand-text-blue {
+  color: #00B4D8 !important;
+  font-family: 'Inter', 'Poppins', sans-serif !important;
 }
 
 .dash-sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
+  gap: 0.45rem;
 }
 
 .dash-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0.65rem 0.95rem;
-  border-radius: 10px;
+  padding: 0.72rem 1rem;
+  border-radius: 12px;
   color: #94a3b8 !important;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   width: 100%;
   text-align: left;
 }
 
-.dash-nav-item i,
-.dash-nav-item svg {
+.dash-nav-icon {
   font-size: 1.15rem;
   flex-shrink: 0;
+  color: #64748b;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .dash-nav-item:hover {
   color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(3px);
+}
+
+.dash-nav-item:hover .dash-nav-icon {
+  color: #38bdf8;
 }
 
 .dash-nav-item.active {
-  background-color: #2563eb !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
   color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+  border-color: rgba(96, 165, 250, 0.3);
 }
 
-.dash-nav-item.active i,
-.dash-nav-item.active svg {
+.dash-nav-item.active .dash-nav-icon {
   color: #ffffff !important;
 }
 
-/* ── Go Premium Box ── */
-.dash-premium-card {
-  background: linear-gradient(180deg, #0f1c35 0%, #0c162a 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 14px;
-  padding: 1.15rem 1rem;
-  margin: 1.5rem 0 1rem 0;
-  text-align: left;
-  position: relative;
+.dash-nav-item::after,
+.dash-nav-item.active::after,
+.dash-sidebar-nav .active::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ── Sidebar Footer & User Status ── */
+.dash-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dash-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.dash-sidebar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+}
+
+.dash-sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   overflow: hidden;
 }
 
-.dash-premium-card::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 60px;
-  height: 60px;
-  background: rgba(245, 158, 11, 0.15);
-  border-radius: 50%;
-  filter: blur(15px);
-}
-
-.dash-premium-icon {
-  color: #f59e0b;
-  font-size: 1.25rem;
-  margin-bottom: 0.4rem;
-}
-
-.dash-premium-title {
-  color: #ffffff !important;
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.dash-premium-desc {
-  color: #94a3b8 !important;
-  font-size: 0.76rem;
-  line-height: 1.35;
-  margin-bottom: 0.85rem;
-}
-
-.dash-upgrade-btn {
-  background-color: #2563eb;
-  color: #ffffff !important;
-  font-size: 0.8rem;
+.dash-sidebar-username {
+  color: #f1f5f9;
+  font-size: 0.86rem;
   font-weight: 600;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
-  border: none;
-  width: 100%;
-  text-align: center;
-  transition: background-color 0.2s ease;
-  display: inline-block;
-  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.dash-upgrade-btn:hover {
-  background-color: #1d4ed8;
-  color: #ffffff !important;
+.dash-sidebar-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: #10b981;
+}
+
+.dash-status-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
 }
 
 .dash-sidebar-logout {
@@ -2556,15 +2613,25 @@ ul {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   width: 100%;
   text-align: left;
 }
 
+.dash-logout-icon {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
 .dash-sidebar-logout:hover {
   color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.dash-sidebar-logout:hover .dash-logout-icon {
+  transform: translateX(3px);
 }
 
 /* ── Main Content Area ── */

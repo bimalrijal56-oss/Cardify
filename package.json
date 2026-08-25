@@ -1,4 +1,9 @@
 {
+  "name": "cardify",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd cardify_frontend && npm install && npm run build"
+  },
   "dependencies": {
     "bootstrap-icons": "^1.13.1",
     "dom-to-image-more": "^3.10.2",

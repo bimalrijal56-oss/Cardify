@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd cardify_frontend && npm install && npm run build",
+  "outputDirectory": "cardify_frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

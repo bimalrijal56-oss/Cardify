@@ -352,7 +352,6 @@ const CardPreview = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
                     {/* Right: Actions */}
                     <div className="col-12 col-lg-5">
