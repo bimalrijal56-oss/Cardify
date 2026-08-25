@@ -1,26 +1,33 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import QRCode from "react-qr-code";
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import { API_BASE_URL } from '../config';
 import { BsSearch, BsPlusLg, BsPlusCircleDotted, BsEye, BsTrash, BsShare } from 'react-icons/bs';
 import { FaShareAlt } from 'react-icons/fa';
 
 const Cardlist = () => {
+  const navigate = useNavigate();
   const { uuid } = useParams();
-  const user_id = Number(localStorage.getItem("user_id"));
+  const rawUserId = localStorage.getItem("user_id");
+  const user_id = rawUserId ? Number(rawUserId) : null;
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    if (!rawUserId) {
+      toast.info('Please log in to view your cards.', { className: 'toast-warning-glow' });
+      navigate('/login');
+      return;
+    }
     setLoading(true);
     axios.get(`${API_BASE_URL}/api/cards/?format=json`)
       .then(res => setCards(res.data || []))
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [rawUserId, navigate]);
 
   const cardlink = (cardUuid) => `${window.location.origin}/card/${cardUuid}`;
 

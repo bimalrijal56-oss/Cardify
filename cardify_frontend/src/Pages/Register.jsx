@@ -5,20 +5,17 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-
+import { API_BASE_URL } from '../config';
 
 const Register = () => {
     const navigate = useNavigate();
 
-
-
     const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (values, { resetForm }) => {
-
         try {
             const response = await axios.post(
-                "https://cardify-ge3r.onrender.com/sign-up",
+                `${API_BASE_URL}/sign-up`,
                 {
                     username: values.uname,
                     password: values.pwd,
@@ -26,7 +23,6 @@ const Register = () => {
                     profession: values.profession,
                     institute: values.institute,
                     address: values.address,
-
                 }
             );
             toast.success("Signup Successful", {

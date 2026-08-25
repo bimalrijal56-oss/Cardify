@@ -5,37 +5,36 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-
+import { API_BASE_URL } from '../config';
 
 const Login = () => {
   const navigate = useNavigate();
   const handleSubmit = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
-        "https://cardify-ge3r.onrender.com/login",
+        `${API_BASE_URL}/login`,
         {
           email: values.email,
           password: values.pwd,
         });
 
+      if (response.data && response.data.user_id) {
+        localStorage.setItem("username", response.data.username || "User");
+        localStorage.setItem("user_id", String(response.data.user_id));
 
-
-      localStorage.setItem("username", response.data.username);
-      localStorage.setItem("user_id", response.data.user_id);
-
-
-      toast.success("Logged in Sucessfully", { className: 'toast-success-glow' },)
-
-
-      resetForm();
-      navigate('/dashboard');
+        toast.success("Logged in successfully", { className: 'toast-success-glow' });
+        resetForm();
+        navigate('/dashboard');
+      } else {
+        toast.error("Invalid response from server. Please try again.", { className: 'toast-error-glow' });
+      }
     }
     catch (error) {
-      console.log(error.response?.data || error.message)
-      toast.error("Something went wrong", {
+      console.error(error.response?.data || error.message);
+      const serverErr = error.response?.data?.error || "Invalid email or password";
+      toast.error(serverErr, {
         className: 'toast-error-glow',
-      })
-
+      });
     }
   }
 

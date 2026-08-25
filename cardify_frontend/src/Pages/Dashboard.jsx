@@ -18,11 +18,12 @@ import {
   BsBarChartFill,
   BsPlusCircleDotted,
 } from 'react-icons/bs';
-import { FaBell } from 'react-icons/fa';
+import { FaBell, FaShareAlt } from 'react-icons/fa';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user_id = Number(localStorage.getItem('user_id'));
+  const rawUserId = localStorage.getItem('user_id');
+  const user_id = rawUserId ? Number(rawUserId) : null;
   const storedUsername = localStorage.getItem('username');
   const displayName = storedUsername || 'User';
 
@@ -30,6 +31,14 @@ const Dashboard = () => {
   const [totalClicks, setTotalClicks] = useState(0);
   const [timeFilter, setTimeFilter] = useState('All Time');
   const [loading, setLoading] = useState(true);
+
+  // Check login authentication
+  useEffect(() => {
+    if (!rawUserId || !storedUsername) {
+      toast.info('Please log in to view your dashboard.', { className: 'toast-warning-glow' });
+      navigate('/login');
+    }
+  }, [rawUserId, storedUsername, navigate]);
 
   // Fetch real user cards
   useEffect(() => {

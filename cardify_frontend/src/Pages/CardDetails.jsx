@@ -49,6 +49,15 @@ const CardDetails = () => {
     theme: initialTheme,
   });
 
+  // Check login authentication on load
+  useEffect(() => {
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      toast.info('Please log in before creating a business card.', { className: 'toast-warning-glow' });
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -78,6 +87,13 @@ const CardDetails = () => {
       return;
     }
 
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      toast.warning('Please log in first to create your card.', { className: 'toast-warning-glow' });
+      navigate('/login');
+      return;
+    }
+
     if (!cardData.name.trim()) {
       toast.warning('Please enter your full name.', { className: 'toast-warning-glow' });
       return;
@@ -102,7 +118,7 @@ const CardDetails = () => {
     formData.append('linkedin_link', cardData.linkedin);
     formData.append('insta_link', cardData.instagram);
     formData.append('theme', cardData.theme);
-    formData.append('user', localStorage.getItem('user_id'));
+    formData.append('user', userId);
 
     try {
       const response = await toast.promise(
@@ -118,6 +134,17 @@ const CardDetails = () => {
       });
     } catch (error) {
       const errorData = error.response?.data;
+      const rawErrorStr = JSON.stringify(errorData || error.message || '');
+
+      if (rawErrorStr.includes('Invalid pk') || rawErrorStr.includes('does not exist')) {
+        // User session in localStorage is stale or points to a non-existent DB record
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        toast.error('Your login session is invalid. Please log in again.', { className: 'toast-error-glow' });
+        navigate('/login');
+        return;
+      }
+
       const errorMessage =
         typeof errorData === 'string'
           ? errorData
