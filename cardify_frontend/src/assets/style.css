@@ -2431,7 +2431,9 @@ ul {
   border-right: 1px solid rgba(255, 255, 255, 0.07);
   z-index: 100;
   transition: transform 0.3s ease;
-  min-height: 100vh;
+  height: 100vh;
+  position: sticky;
+  top: 0;
 }
 
 .dash-sidebar-top {
@@ -3209,21 +3211,84 @@ ul {
 @media (max-width: 900px) {
   .dashboard-layout {
     flex-direction: column;
+    min-height: 100vh;
   }
   .dash-sidebar {
     width: 100%;
     min-width: 100%;
+    min-height: auto !important;
+    height: auto !important;
+    position: relative !important;
+    top: auto;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 1rem;
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+    justify-content: flex-start !important;
+  }
+  .dash-sidebar-top {
+    gap: 0.4rem;
+  }
+  .dash-sidebar-brand {
+    padding: 0 0 0.5rem 0;
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .dash-sidebar-logo-img {
+    width: 32px;
+  }
+  .dash-sidebar-brand-text {
+    font-size: 1.2rem;
   }
   .dash-sidebar-nav {
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.35rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.45rem;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .dash-sidebar-nav::-webkit-scrollbar {
+    display: none;
   }
   .dash-nav-item {
     width: auto;
+    white-space: nowrap;
+    padding: 0.48rem 0.85rem;
+    font-size: 0.86rem;
+    flex-shrink: 0;
+    border-radius: 9px;
+  }
+  .dash-nav-item:hover {
+    transform: none;
+  }
+  .dash-sidebar-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.55rem;
+    margin-top: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 0.75rem;
+  }
+  .dash-sidebar-user {
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+  }
+  .dash-sidebar-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.78rem;
+    border-radius: 6px;
+  }
+  .dash-sidebar-username {
+    font-size: 0.82rem;
+  }
+  .dash-sidebar-logout {
+    width: auto;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
   }
   .dash-premium-card {
     display: none;
